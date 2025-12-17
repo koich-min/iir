@@ -199,6 +199,14 @@ infer internal structure, roles, or access patterns.
 
 ---
 
+### Links
+
+For a minimal setup guide for first-time users, see [quickstart](docs/quickstart.md).
+
+For internal HTTP API usage and verification, see [api](docs/api.md).
+
+---
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
