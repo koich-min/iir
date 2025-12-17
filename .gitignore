@@ -1,0 +1,88 @@
+############################
+# OS / Editor
+############################
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# JetBrains
+.idea/
+
+############################
+# Python / Django
+############################
+
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+############################
+# Node / TypeScript (Canvas)
+############################
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+dist/
+build/
+*.tsbuildinfo
+
+############################
+# Docker
+############################
+
+# Local overrides only
+docker-compose.override.yml
+
+############################
+# Codex / AI Agents
+############################
+
+.codex/
+
+############################
+# Secrets / Environment
+############################
+
+.env
+.env.*
+!.env.example
+
+############################
+# Temporary / Misc
+############################
+
+*.swp
+*.swo
+*~
+.cache/
+tmp/
+
