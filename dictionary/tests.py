@@ -1,5 +1,6 @@
 from django.db import IntegrityError, transaction
 from django.test import TestCase
+from django.urls import reverse
 
 from .models import Entry
 from .replacement import pseudonym_for, replace
@@ -57,3 +58,30 @@ class ReplacementTests(TestCase):
 
         with self.assertRaises(ValueError):
             replace("anything", entries=[entry])
+
+
+class ReplaceViewTests(TestCase):
+    def setUp(self):
+        self.url = reverse("replace")
+
+    def test_get_sets_default_categories_and_empty_output(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            set(response.context["selected_categories"]),
+            {"HOST", "NAME", "SERVICE", "WORD"},
+        )
+        self.assertEqual(response.context["output"], "")
+        self.assertEqual(response.context["text"], "")
+
+    def test_post_applies_selected_categories_only(self):
+        host = Entry.objects.create(category="HOST", value="alpha")
+        Entry.objects.create(category="NAME", value="bravo")
+
+        response = self.client.post(
+            self.url, {"text": "alpha bravo", "categories": ["HOST"]}
+        )
+
+        self.assertContains(response, f"Host{host.id}")
+        self.assertContains(response, "bravo")
