@@ -1,17 +1,24 @@
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
-from .models import Entry
+from .models import CategorySuggestion, Entry
 from .replacement import replace
-
-
-CATEGORIES = ["HOST", "NAME", "SERVICE", "WORD"]
 
 
 @require_http_methods(["GET", "POST"])
 def replace_view(request):
-    selected = set(request.POST.getlist("categories")) if request.method == "POST" else set(CATEGORIES)
-    text = request.POST.get("text", "") if request.method == "POST" else ""
+    categories = list(
+        Entry.objects.filter(is_active=True)
+        .values_list("category", flat=True)
+        .distinct()
+        .order_by("category")
+    )
+    if request.method == "POST":
+        selected = set(request.POST.getlist("categories"))
+        text = request.POST.get("text", "")
+    else:
+        selected = set(categories)
+        text = ""
     output = ""
 
     if request.method == "POST":
@@ -27,9 +34,12 @@ def replace_view(request):
             output = text
 
     context = {
-        "categories": CATEGORIES,
+        "categories": categories,
         "selected_categories": selected,
         "text": text,
         "output": output,
+        "category_suggestions": CategorySuggestion.objects.filter(
+            is_active=True
+        ),
     }
     return render(request, "dictionary/replace.html", context)

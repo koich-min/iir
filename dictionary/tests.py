@@ -2,7 +2,7 @@ from django.db import IntegrityError, transaction
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Entry
+from .models import CategorySuggestion, Entry
 from .replacement import pseudonym_for, replace
 
 
@@ -60,24 +60,48 @@ class ReplacementTests(TestCase):
             replace("anything", entries=[entry])
 
 
+class CategorySuggestionTests(TestCase):
+    def test_name_is_unique(self):
+        CategorySuggestion.objects.create(name="HOST")
+
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                CategorySuggestion.objects.create(name="HOST")
+
+    def test_note_is_optional_and_active_default(self):
+        suggestion = CategorySuggestion.objects.create(name="SERVICE", note="")
+
+        self.assertTrue(suggestion.is_active)
+        self.assertEqual(suggestion.note, "")
+
+
 class ReplaceViewTests(TestCase):
     def setUp(self):
         self.url = reverse("replace")
 
     def test_get_sets_default_categories_and_empty_output(self):
+        CategorySuggestion.objects.create(name="HOST")
+        CategorySuggestion.objects.create(name="LEGACY", is_active=False)
+        Entry.objects.create(category="HOST", value="alpha")
+        Entry.objects.create(category="WORD", value="beta", is_active=False)
+
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             set(response.context["selected_categories"]),
-            {"HOST", "NAME", "SERVICE", "WORD"},
+            {"HOST"},
         )
+        self.assertEqual(list(response.context["categories"]), ["HOST"])
         self.assertEqual(response.context["output"], "")
         self.assertEqual(response.context["text"], "")
+        suggestions = list(response.context["category_suggestions"])
+        self.assertEqual([c.name for c in suggestions], ["HOST"])
 
     def test_post_applies_selected_categories_only(self):
         host = Entry.objects.create(category="HOST", value="alpha")
         Entry.objects.create(category="NAME", value="bravo")
+        Entry.objects.create(category="WORD", value="charlie", is_active=False)
 
         response = self.client.post(
             self.url, {"text": "alpha bravo", "categories": ["HOST"]}
@@ -85,3 +109,11 @@ class ReplaceViewTests(TestCase):
 
         self.assertContains(response, f"Host{host.id}")
         self.assertContains(response, "bravo")
+
+    def test_get_with_no_entries_renders_without_categories(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(list(response.context["categories"]), [])
+        self.assertEqual(set(response.context["selected_categories"]), set())
+        self.assertEqual(response.context["output"], "")
