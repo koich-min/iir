@@ -111,6 +111,22 @@ Notes:
 
 ---
 
+## Why iir does not provide reverse replacement
+
+iir intentionally does not provide a reverse (de-pseudonymization) feature.
+
+Once text is replaced, it is assumed to be shared outside of the internal
+boundary. Providing an automated reverse mechanism could create a false sense
+of safety and encourage improper handling of sensitive information.
+
+Original data should always be preserved at its source.
+iir is designed to operate only on copies that are prepared for external use.
+
+If mapping back is ever required, it should be done explicitly by humans using
+the internal dictionary database, not by automated tooling.
+
+---
+
 ## Design Philosophy
 
 - iir does not auto-discover internal identifiers
