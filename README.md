@@ -65,7 +65,7 @@ Example:
 
 ---
 
-## CLI Usage (Recommended)
+## Basic Usage (CLI – Recommended)
 
 iir provides a standalone CLI entry point.
 
@@ -78,7 +78,7 @@ echo "connect to my.domain" | iir replace
 This is the primary and recommended usage pattern.
 Options allow limiting or excluding categories as needed.
 
-### Register entries from stdin
+### Register entries (stdin)
 
 ```bash
 echo "srv-prod-01" | iir add-entry HOST
@@ -86,23 +86,6 @@ echo "srv-prod-01" | iir add-entry HOST
 
 Duplicate entries are ignored safely.
 This design allows iir to integrate naturally with existing UNIX pipelines.
-
-### Web Replace Form
-
-The Web UI provides a simple form-based replacement interface.
-
-- Paste text to be replaced
-- Categories are derived from existing Entry data
-- All categories are selected by default
-- Unchecked categories are ignored
-
-This mode is intended for:
-
-- Manual inspection
-- Preparing logs for external sharing
-- Sanitizing text before sending to AI tools
-
----
 
 ## Registering Entries (Examples)
 
@@ -129,6 +112,23 @@ Notes:
 - Only names are imported (IPs are ignored)
 - Trailing dots from FQDNs are removed
 - Review entries in Django admin if needed
+
+## Web Usage Modes
+
+### Replace Form
+
+The Web UI provides a simple form-based replacement interface.
+
+- Paste text to be replaced
+- Categories are derived from existing Entry data
+- All categories are selected by default
+- Unchecked categories are ignored
+
+This mode is intended for:
+
+- Manual inspection
+- Preparing logs for external sharing
+- Sanitizing text before sending to AI tools
 
 ---
 
