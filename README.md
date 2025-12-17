@@ -140,6 +140,25 @@ This keeps the dictionary trustworthy and predictable.
 
 ---
 
+## What should be registered as Entry?
+
+The following categories are commonly useful as an initial set.
+They are not mandatory and should be adjusted based on your environment
+and what you consider internal information.
+
+| Category | Examples | Reason |
+|---|---|---|
+| HOST | vm014, db-prod-01 | Reveals infrastructure structure |
+| DOMAIN | my.domain | Exposes internal network boundary |
+| NAME | deploy, admin, koich | Identifies users or service accounts |
+| SERVICE | auth-service, billing-api | Reveals system architecture |
+| WORD | prod, staging | Leaks environment or operational context |
+
+As a general rule, consider registering a value if exposing it could allow
+a third party to infer internal structure, roles, or access patterns.
+
+---
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
