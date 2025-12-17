@@ -17,6 +17,9 @@ It replaces internal names (users, hosts, services, domains, and arbitrary
 internal words) with stable, meaningful pseudonyms while preserving the
 structure and intent of the original text.
 
+The primary goal is **structural safety**:  
+internal information must not leak even when humans make mistakes.
+
 ---
 
 ## What This Project Is NOT
@@ -28,6 +31,11 @@ Although it *can* operate as a proxy in some configurations,
 
 The core concept is **replacement**, not mediation.
 
+iir is also **not** a redaction tool:
+- Data is not removed
+- Data is not masked
+- Meaning is preserved through pseudonyms
+
 ---
 
 ## Core Philosophy
@@ -38,6 +46,7 @@ The core concept is **replacement**, not mediation.
 This project assumes:
 - Internal text will be copied
 - Logs will be shared
+- Commands will be piped
 - AI tools will be used
 
 The system must remain safe even when users forget to sanitize data manually.
@@ -79,6 +88,7 @@ Pseudonyms are deterministic and derived from Django model IDs.
 | Name | Name3 |
 | Service | Service7 |
 | Word | Word21 |
+| Domain | Domain5 |
 
 - The database `id` is the source of truth
 - IDs are stable
@@ -86,6 +96,20 @@ Pseudonyms are deterministic and derived from Django model IDs.
 - Re-numbering is discouraged
 
 Pseudonyms are designed to preserve meaning, not to redact.
+
+---
+
+## Non-Reversibility Policy
+
+iir **intentionally does not provide a reverse (de-anonymization) mechanism**.
+
+This is a deliberate security decision:
+- Reverse mappings encourage unsafe workflows
+- Storing or exposing reverse logic increases blast radius
+- External outputs must be treated as permanently detached from internal data
+
+If reverse lookup is required, it must occur **outside of iir** under
+strictly controlled internal procedures.
 
 ---
 
@@ -106,12 +130,21 @@ This avoids unnecessary complexity and prevents unintended replacements.
 
 ## Data Model (Conceptual)
 
-Each dictionary entry must include:
+Each dictionary entry includes:
 
-- Category (Host / Name / Service / Word / etc.)
+- Category (free-form label)
 - Internal value (exact match target)
 - Active flag (logical deletion)
 - Timestamps
+
+### Category Design
+
+- Categories are **labels**, not enforced types
+- No fixed enum or hard-coded list
+- Users may add, remove, or rename categories freely
+- The system does not assume semantic meaning beyond labeling
+
+This allows the dictionary to evolve with real-world usage.
 
 The dictionary database is a **highly sensitive internal asset**.
 
@@ -119,14 +152,31 @@ The dictionary database is a **highly sensitive internal asset**.
 
 ## Execution Modes (Non-Exclusive)
 
-iir may be executed in multiple modes:
+iir supports multiple execution modes:
 
 - Web application (form-based replacement)
 - CLI filter (stdin → stdout)
+- CLI entry point (`iir replace`)
 - HTTP-based service
 - MCP adapter (LLM safety layer)
 
 No single execution mode defines the system.
+
+All modes share the same replacement rules and dictionary.
+
+---
+
+## CLI and Django Relationship
+
+iir is implemented as a Django project internally, but:
+
+- The Django project itself is not packaged or distributed
+- The CLI entry point (`iir`) bootstraps Django explicitly
+- The project root is required at runtime
+
+This design keeps:
+- Django as an internal implementation detail
+- The CLI interface simple and stable
 
 ---
 
