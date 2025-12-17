@@ -87,6 +87,13 @@ Duplicate entries are ignored safely.
 
 ---
 
+### Example: Import domain from echo
+
+```bash
+echo "my.domain" | pipenv run python manage.py add_entry DOMAIN
+```
+
+
 ### Example: Import hosts from DNS (AXFR)
 
 If your internal DNS allows zone transfer:
