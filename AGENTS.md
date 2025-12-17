@@ -13,17 +13,17 @@ iir — Internal Info Replacement
 **iir** is a system for deterministic replacement of internal identifiers
 before information is shared outside of a trusted boundary.
 
-It replaces internal names (users, hosts, services, arbitrary internal words)
-with stable, meaningful pseudonyms while preserving the structure and meaning
-of the original text.
+It replaces internal names (users, hosts, services, domains, and arbitrary
+internal words) with stable, meaningful pseudonyms while preserving the
+structure and intent of the original text.
 
 ---
 
 ## What This Project Is NOT
 
-iir is **not** limited to a network proxy.
+iir is **not** defined by a single execution model.
 
-Although it *can* act as a proxy in some configurations,  
+Although it *can* operate as a proxy in some configurations,
 **proxy behavior is only one possible execution mode**, not the core concept.
 
 The core concept is **replacement**, not mediation.
@@ -86,6 +86,21 @@ Pseudonyms are deterministic and derived from Django model IDs.
 - Re-numbering is discouraged
 
 Pseudonyms are designed to preserve meaning, not to redact.
+
+---
+
+## Domains and Similar Identifiers
+
+Domain names, FQDNs, and similar identifiers are considered **internal
+information** and SHOULD be registered in the dictionary when needed.
+
+They are treated as **normal dictionary entries** and follow the same rules:
+
+- Exact match only
+- No special parsing
+- No URL or email decomposition
+
+This avoids unnecessary complexity and prevents unintended replacements.
 
 ---
 
