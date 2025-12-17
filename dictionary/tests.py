@@ -1,6 +1,12 @@
+from io import StringIO
+from unittest.mock import patch
+
+from django.core.management import call_command
 from django.db import IntegrityError, transaction
 from django.test import TestCase
 from django.urls import reverse
+
+from iir.cli import main
 
 from .models import Entry
 from .replacement import pseudonym_for, replace
@@ -98,3 +104,64 @@ class ReplaceViewTests(TestCase):
         self.assertEqual(list(response.context["categories"]), [])
         self.assertEqual(set(response.context["selected_categories"]), set())
         self.assertEqual(response.context["output"], "")
+
+
+class ReplaceTextCommandTests(TestCase):
+    def run_command(self, args=None, stdin_value=""):
+        args = args or []
+        out = StringIO()
+        err = StringIO()
+        stdin = StringIO(stdin_value)
+        with patch("sys.stdin", stdin):
+            call_command("replace_text", *args, stdout=out, stderr=err)
+        return out.getvalue(), err.getvalue()
+
+    def test_replaces_all_categories_by_default(self):
+        host = Entry.objects.create(category="HOST", value="alpha")
+        word = Entry.objects.create(category="WORD", value="bravo")
+
+        out, err = self.run_command(stdin_value="alpha bravo")
+
+        self.assertEqual(err, "")
+        self.assertEqual(out, f"Host{host.id} Word{word.id}")
+
+    def test_category_filter_limits_replacement(self):
+        host = Entry.objects.create(category="HOST", value="alpha")
+        Entry.objects.create(category="WORD", value="bravo")
+
+        out, err = self.run_command(args=["--category", "HOST"], stdin_value="alpha bravo")
+
+        self.assertEqual(err, "")
+        self.assertEqual(out, f"Host{host.id} bravo")
+
+    def test_exclude_filter_applies_when_no_category_list(self):
+        host = Entry.objects.create(category="HOST", value="alpha")
+        Entry.objects.create(category="WORD", value="bravo")
+
+        out, err = self.run_command(args=["--exclude", "WORD"], stdin_value="alpha bravo")
+
+        self.assertEqual(err, "")
+        self.assertEqual(out, f"Host{host.id} bravo")
+
+    def test_dry_run_reports_counts_and_omits_output(self):
+        Entry.objects.create(category="HOST", value="alpha")
+
+        out, err = self.run_command(args=["--dry-run"], stdin_value="alpha alpha")
+
+        self.assertEqual(out, "")
+        self.assertEqual(err.strip(), "HOST: 2")
+
+
+class CliEntryPointTests(TestCase):
+    def test_unknown_subcommand_exits_with_error(self):
+        with patch("sys.stderr", new=StringIO()) as stderr:
+            exit_code = main(["unknown"])
+        self.assertNotEqual(exit_code, 0)
+        self.assertIn("Unknown subcommand", stderr.getvalue())
+
+    def test_replace_subcommand_invokes_management_command(self):
+        with patch("iir.cli.call_command") as call_cmd:
+            exit_code = main(["replace", "--category", "HOST"])
+
+        self.assertEqual(exit_code, 0)
+        call_cmd.assert_called_once_with("replace_text", "--category", "HOST")

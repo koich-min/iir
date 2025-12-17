@@ -86,3 +86,7 @@ docker-compose.override.yml
 .cache/
 tmp/
 
+
+# Python packaging
+*.egg-info/
+
