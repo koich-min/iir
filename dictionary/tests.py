@@ -2,7 +2,7 @@ from django.db import IntegrityError, transaction
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import CategorySuggestion, Entry
+from .models import Entry
 from .replacement import pseudonym_for, replace
 
 
@@ -58,21 +58,6 @@ class ReplacementTests(TestCase):
 
         with self.assertRaises(ValueError):
             replace("anything", entries=[entry])
-
-
-class CategorySuggestionTests(TestCase):
-    def test_name_is_unique(self):
-        CategorySuggestion.objects.create(name="HOST")
-
-        with self.assertRaises(IntegrityError):
-            with transaction.atomic():
-                CategorySuggestion.objects.create(name="HOST")
-
-    def test_note_is_optional_and_active_default(self):
-        suggestion = CategorySuggestion.objects.create(name="SERVICE", note="")
-
-        self.assertTrue(suggestion.is_active)
-        self.assertEqual(suggestion.note, "")
 
 
 class ReplaceViewTests(TestCase):

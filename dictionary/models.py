@@ -18,17 +18,3 @@ class Entry(models.Model):
 
     def __str__(self) -> str:  # pragma: no cover - trivial
         return f"{self.category}:{self.value}"
-
-
-class CategorySuggestion(models.Model):
-    name = models.CharField(max_length=64, unique=True)
-    is_active = models.BooleanField(default=True)
-    note = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["name"]
-
-    def __str__(self) -> str:  # pragma: no cover - trivial
-        return self.name
