@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
-from .models import CategorySuggestion, Entry
+from .models import Entry
 from .replacement import replace
 
 
@@ -38,8 +38,5 @@ def replace_view(request):
         "selected_categories": selected,
         "text": text,
         "output": output,
-        "category_suggestions": CategorySuggestion.objects.filter(
-            is_active=True
-        ),
     }
     return render(request, "dictionary/replace.html", context)

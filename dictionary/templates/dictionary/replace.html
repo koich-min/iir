@@ -22,15 +22,6 @@
             {% empty %}
                 <p>No categories available yet.</p>
             {% endfor %}
-            <div>
-                <label for="category-input">Add category</label><br>
-                <input id="category-input" type="text" name="categories" list="category-list" placeholder="Optional category hint">
-                <datalist id="category-list">
-                    {% for suggestion in category_suggestions %}
-                        <option value="{{ suggestion.name }}">
-                    {% endfor %}
-                </datalist>
-            </div>
         </div>
         <div>
             <button type="submit">Replace</button>

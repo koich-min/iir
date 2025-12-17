@@ -80,8 +80,6 @@ class ReplaceViewTests(TestCase):
         self.url = reverse("replace")
 
     def test_get_sets_default_categories_and_empty_output(self):
-        CategorySuggestion.objects.create(name="HOST")
-        CategorySuggestion.objects.create(name="LEGACY", is_active=False)
         Entry.objects.create(category="HOST", value="alpha")
         Entry.objects.create(category="WORD", value="beta", is_active=False)
 
@@ -95,8 +93,6 @@ class ReplaceViewTests(TestCase):
         self.assertEqual(list(response.context["categories"]), ["HOST"])
         self.assertEqual(response.context["output"], "")
         self.assertEqual(response.context["text"], "")
-        suggestions = list(response.context["category_suggestions"])
-        self.assertEqual([c.name for c in suggestions], ["HOST"])
 
     def test_post_applies_selected_categories_only(self):
         host = Entry.objects.create(category="HOST", value="alpha")
