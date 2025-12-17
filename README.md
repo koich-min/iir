@@ -116,12 +116,13 @@ echo "my.domain" | iir add-entry DOMAIN
 
 If your internal DNS allows zone transfer:
 
+```bash
 dig axfr my.domain @dns-server \
   | awk '{print $1}' \
   | sed 's/\.$//' \
   | sort -u \
   | iir add-entry HOST
-
+```
 
 Notes:
 
