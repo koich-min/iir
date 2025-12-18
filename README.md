@@ -221,6 +221,13 @@ For deeper design rationale and constraints, see AGENTS.md.
 
 ---
 
+## Administration
+
+For initial administrative setup (creating superuser, issuing tokens),
+see [Initial Administrative Setup](docs/initial-admin.md).
+
+---
+
 ## What should be registered as Entry?
 
 The following categories are commonly useful as an initial set.
