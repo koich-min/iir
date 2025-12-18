@@ -55,6 +55,14 @@ docker-compose.yml, or Kubernetes manifests.
 
 ---
 
+## Sqlite Persistence (Optional)
+
+When using sqlite, you may specify a custom database file location using the optional `SQLITE_PATH` environment variable.
+
+This is useful for simple persistence tests using a volume mount, without mounting the application directory.
+
+---
+
 ## Running the Container
 
 The Dockerfile does not define a default command.
