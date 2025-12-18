@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -76,12 +77,47 @@ WSGI_APPLICATION = 'svr.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+db_engine = os.environ.get("DB_ENGINE", "sqlite").lower()
+
+if db_engine == "sqlite":
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+elif db_engine == "postgresql":
+    required_vars = ["DB_NAME", "DB_USER", "DB_PASSWORD", "DB_HOST"]
+    missing = [var for var in required_vars if not os.environ.get(var)]
+    if missing:
+        raise RuntimeError(f"Missing required database settings: {', '.join(missing)}")
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ["DB_NAME"],
+            'USER': os.environ["DB_USER"],
+            'PASSWORD': os.environ["DB_PASSWORD"],
+            'HOST': os.environ["DB_HOST"],
+            'PORT': os.environ.get("DB_PORT", "5432"),
+        }
+    }
+elif db_engine == "mysql":
+    required_vars = ["DB_NAME", "DB_USER", "DB_PASSWORD", "DB_HOST"]
+    missing = [var for var in required_vars if not os.environ.get(var)]
+    if missing:
+        raise RuntimeError(f"Missing required database settings: {', '.join(missing)}")
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ["DB_NAME"],
+            'USER': os.environ["DB_USER"],
+            'PASSWORD': os.environ["DB_PASSWORD"],
+            'HOST': os.environ["DB_HOST"],
+            'PORT': os.environ.get("DB_PORT", "3306"),
+        }
+    }
+else:
+    raise RuntimeError(f"Unsupported DB_ENGINE value: {os.environ.get('DB_ENGINE')}")
 
 
 # Password validation
