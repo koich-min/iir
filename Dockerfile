@@ -1,0 +1,24 @@
+FROM python:3.12-slim-bookworm
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+RUN set -eux; \
+  apt-get update; \
+  apt-get install -y --no-install-recommends \
+  build-essential \
+  libpq-dev \
+  default-libmysqlclient-dev \
+  ca-certificates \
+  curl; \
+rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY . /app
+
+RUN groupadd --system iir && useradd --system --gid iir --create-home iir \
+  && chown -R iir:iir /app
+
+USER iir
+
