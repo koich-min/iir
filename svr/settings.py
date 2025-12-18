@@ -80,10 +80,11 @@ WSGI_APPLICATION = 'svr.wsgi.application'
 db_engine = os.environ.get("DB_ENGINE", "sqlite").lower()
 
 if db_engine == "sqlite":
+    sqlite_path = os.environ.get("SQLITE_PATH", BASE_DIR / 'db.sqlite3')
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'NAME': sqlite_path,
         }
     }
 elif db_engine == "postgresql":
