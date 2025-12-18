@@ -1,48 +1,31 @@
-# General version control / metadata
-.git
-.gitinore
-.codex/
+# Git metadata
+.git/
+.gitignore
 
-# Python cache / compiled artifacts
-__pycache__/
-pyc_cache/
-*.pyc
-*.pyo
-.pypt
-.pyz
-
-# Virtual environments (local only)
-.venv/
-.venv/
-PIPENV_VIRTUALENV/
-
-# Local database files (must not be containerized)
-db.sqlite3
-
-# Local configuration / secrets
+# Environment and secret files
 .env
 .env.*
 .env.secret
 .env.secret.*
 
-# Test and CI artifacts (not required at runtime)
+# Python cache and build artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+build/
+dist/
+
+# Tests and test data
 api/tests.py
 dictionary/tests.py
 */tests/
 */test/*
-.tox/
-.coverage
-coverage.xml
 
-# Development artifacts
-iir.egg-info/
-dist/
-build/
+# Documentation and development-only files
+docs/
+.codex/
 
-# OS files
-.DS_Store
-Thumbs.db
-
-# Documentation build output
-docs/_build/
-
+# Local databases
+db.sqlite3
