@@ -44,6 +44,19 @@ pipenv shell
 
 Alternatively, you may use venv/pip directly.
 
+### Environment Variables (Optional)
+
+For local use, the repository provides example environment templates:
+
+- `.env.tmpl`
+- `.env.secret.tmpl`
+
+These files list all supported environment variables and can be copied
+to `.env` / `.env.secret` if needed.
+
+Using these files is optional; iir can also be configured by exporting
+environment variables directly in your shell.
+
 ---
 
 ## Initialize the Database
