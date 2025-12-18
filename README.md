@@ -10,6 +10,51 @@ not leak outside a trusted boundary.
 
 ---
 
+## Two Usage Modes (Important)
+
+iir explicitly supports two different usage modes.
+
+They serve different purposes, and this distinction is intentional.
+
+---
+
+### 1. Local / Personal Mode (CLI-First)
+
+This mode is intended for individual users, developers, and local workflows.
+
+Typical use cases:
+- Preparing logs or text before sharing
+- Sanitizing prompts before sending them to AI tools
+- Ad-hoc replacement in pipelines or scripts
+
+Characteristics:
+- CLI-first design (stdin „ stdout)
+- Installed via pip (e.g. pip install -e .)
+- Sqlite is acceptable for local use
+- Django is an internal implementation detail (not a user concern)
+
+---
+
+### 2 Shared / Boundary Mode (API / Web / MCP)
+
+This mode is intended for shared environments, team usage, and organizational boundaries.
+
+For example:
+- Recommended as a common safety layer before external data sharing
+- Http-based replacement service
+- Web-based manual inspection and replacement
+- MCP adapter as an LLM safety layer
+
+Characteristics:
+- Container-first design (Docker / k8s)
+- External database (PostgreSQL / MySQL)
+- Dictionary is a central, sensitive asset
+- Explicit authentication and access controls
+
+This mode defines the trust boundary between internal and external information.
+
+---
+
 ## Core Idea
 
 The core idea of iir is intentionally simple:
@@ -132,19 +177,14 @@ This mode is intended for:
 
 ---
 
-## Why iir does not provide reverse replacement
+## Non-Reversibility Policy
 
 iir intentionally does not provide a reverse (de-pseudonymization) feature.
 
-Once text is replaced, it is assumed to be shared outside of the internal
-boundary. Providing automated reversal would encourage unsafe workflows
-and increase the risk of accidental data leakage.
+Once text is replaced, it is assumed to be shared outside of the internal boundary.
+Providing automated reversal would encourage unsafe workflows and increase the risk of accidental data leakage.
 
-Original data should always be preserved at its source.
-iir operates only on copies prepared for external use.
-
-If reverse lookup is ever required, it must be done manually using the
-internal dictionary database, not by automated tooling.
+If reverse lookup is ever required, it must be performed manually using the internal dictionary database, not automated tools.
 
 ---
 
@@ -201,9 +241,14 @@ infer internal structure, roles, or access patterns.
 
 ### Links
 
-For a minimal setup guide for first-time users, see [quickstart](docs/quickstart.md).
+- [quickstart](docs/quickstart.md)  
+  Minimal guide for running iir locally in **Local / Personal Mode** (CLI-first).
 
-For internal HTTP API usage and verification, see [api](docs/api.md).
+- [Container / Shared Mode](docs/container-mode.md)  
+  Running iir as a **shared boundary safety layer** using containers (API / Web / MCP).
+
+- [api](docs/api.md)  
+  Internal HTTP API usage and verification examples.
 
 ---
 

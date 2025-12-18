@@ -1,13 +1,15 @@
-# Quickstart – Running iir Locally
+# Quickstart – Running iir Locally (Local / Personal Mode)
 
-This document provides a minimal quickstart for running
-iir locally for evaluation or internal use.
+This document provides a minimal quickstart for running iir locally for evaluation or personal use.
 
-It is intended for users who are not familiar with Django
-internals, but are comfortable with command-line tools.
+It corresponds to the **Local / Personal Mode** described in the main README.
 
-This guide focuses only on getting iir running and
-performing a basic replacement.
+This mode is intended for individual users and local trust boundaries.
+It does not cover containerized deployment, shared environments, or boundary-level usage.
+
+This guide is intended for users who are not familiar with Django internals, but are comfortable with command-line tools.
+
+It focuses only on getting iir running and performing a basic replacement.
 
 For design rationale and security constraints, see AGENTS.md.
 
@@ -84,8 +86,7 @@ Start the development server:
 python manage.py runserver
 
 The web replace form is available at a known URL.
-It is intended for human verification only and is not
-required for normal CLI usage.
+It is intended for human verification only and is not required for normal CLI usage.
 
 ---
 
@@ -108,3 +109,4 @@ For details and verification examples, see docs/api.md.
 
 When ready, you may explore other execution modes
 such as the HTTP API or MCP adapters.
+
