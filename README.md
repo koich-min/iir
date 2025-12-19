@@ -24,6 +24,9 @@ How and where it is operated is the responsibility of the user.
 Please note that the dictionary used by iir should be treated as **your private internal data**.
 Depending on how entries are curated, it can easily become sensitive or security-relevant information.
 
+iir is a utility to assist safe replacement workflows.
+It does not claim to provide complete security guarantees.
+
 ---
 
 ## About MCP integration
