@@ -22,8 +22,9 @@ COPY . /app
 RUN pip install --upgrade pip \
   && pip install --no-cache-dir ".[django]"
 
+RUN python manage.py collectstatic --noinput
+
 RUN groupadd --system iir && useradd --system --gid iir --create-home iir \
   && chown -R iir:iir /app
 
 USER iir
-
