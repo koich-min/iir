@@ -18,7 +18,7 @@ For design rationale and security constraints, see **AGENTS.md**.
 
 ## Prerequisites
 
-- Python **3.11 or newer**
+- Python **3.12 or newer**
 - `git`
 - `pipenv`
 - A POSIX-compatible shell (bash / zsh)
@@ -175,4 +175,3 @@ This quickstart has been validated with:
 - database migration
 - CLI replacement
 - Web replace form (`/replace/`)
-

@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "iir"
 version = "0.0.0"
 description = "Internal Info Replacement CLI"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
   "Django==6.0",
   "djangorestframework==3.16.1",
