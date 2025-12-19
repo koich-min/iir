@@ -50,7 +50,7 @@ def dev_init():
         return 0
 
     secret = get_random_secret_key()
-    SECRET_PATH.write_text(f"DJANGO_SECRET_KEY={secret}\n")
+    SECRET_PATH.write_text(f"DJANGO_SECRET_KEY=\"{secret}\"\n")
     print("Created .env.secret with DJANGO_SECRET_KEY")
     return 0
 
