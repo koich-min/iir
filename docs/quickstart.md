@@ -125,6 +125,12 @@ connect to Host1
 
 For users who prefer a browser-based workflow, iir provides a simple Web UI.
 
+Optional (once before using the web UI locally):
+
+```sh
+pipenv run django collectstatic
+```
+
 Start the development server:
 
 ```sh
