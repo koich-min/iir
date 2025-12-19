@@ -1,4 +1,4 @@
-## iir — Internal Info Replacement
+# iir — Internal Info Replacement
 
 **iir (Internal Info Replacement)** is a lightweight system for safely replacing
 internal identifiers (hosts, domains, service names, user names, etc.) before
@@ -32,10 +32,9 @@ MCP support is planned as an **optional execution mode** for iir.
 It is primarily intended for **on-premise or self-hosted LLM setups**,
 where model outputs need to be sanitized before being exposed externally.
 
-MCP integration does not change the core concept of iir
-. Replacement logic and safety assumptions remain the same,
-and MCP is **not required** for using iir
-effectively.
+MCP integration does not change the core concept of iir.
+Replacement logic and safety assumptions remain the same,
+and MCP is **not required** for using iir effectively.
 
 
 ---
@@ -55,8 +54,9 @@ Typical uses cases:
 - Ad-hoc replacement in pipelines or scripts
 
 Characteristics:
-- CLI-first design (stdin ’ stdout)
+- CLI-first design (stdin → stdout)
 - Simple installation (extra config not required)
+- Suitable for quick evaluation via quickstart
 
 ### 2. Shared / Boundary Mode (API / Web / MCP)
 
@@ -75,8 +75,9 @@ Examples:
 
 ## Basic Usage (CLI, Recommended)
 
+```sh
 echo "connect to my.domain" | iir replace
-
+```
 
 ---
 
@@ -84,7 +85,7 @@ echo "connect to my.domain" | iir replace
 
 - [quickstart](docs/quickstart.md)
 - [Container / Shared Mode](docs/container-mode.md)
-- [api\](docs/api.md)
+- [api](docs/api.md)
 
 ---
 
