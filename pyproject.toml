@@ -7,18 +7,16 @@ name = "iir"
 version = "0.0.0"
 description = "Internal Info Replacement CLI"
 requires-python = ">=3.11"
-
-[project.scripts]
-iir = "iir.cli:main"
-
-[tool.setuptools]
-packages = ["iir"]
-
-[project.optional-dependencies]
-django = [
+dependencies = [
   "Django==6.0",
   "djangorestframework==3.16.1",
   "psycopg2>=2.9",
   "mysqlclient>=2.2",
   "uvicorn>=0.30",
 ]
+
+[project.scripts]
+iir = "iir.cli:main"
+
+[tool.setuptools]
+packages = ["iir"]
