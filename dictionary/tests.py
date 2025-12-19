@@ -1,4 +1,6 @@
+import tempfile
 from io import StringIO
+from pathlib import Path
 from unittest.mock import patch
 
 from django.core.management import call_command
@@ -153,6 +155,31 @@ class ReplaceTextCommandTests(TestCase):
 
 
 class CliEntryPointTests(TestCase):
+    def test_dev_init_creates_secret_file_without_django(self):
+        with tempfile.TemporaryDirectory() as tmpdir, patch(
+            "iir.cli.SECRET_PATH", Path(tmpdir) / ".env.secret"
+        ), patch("iir.cli.django.setup") as setup:
+            exit_code = main(["dev-init"])
+
+        self.assertEqual(exit_code, 0)
+        self.assertFalse(setup.called)
+        secret_file = Path(tmpdir) / ".env.secret"
+        self.assertTrue(secret_file.exists())
+        content = secret_file.read_text()
+        self.assertTrue(content.startswith("DJANGO_SECRET_KEY="))
+        self.assertNotEqual(content.strip(), "DJANGO_SECRET_KEY=")
+
+    def test_dev_init_is_idempotent(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            secret_file = Path(tmpdir) / ".env.secret"
+            secret_file.write_text("DJANGO_SECRET_KEY=existing\n")
+
+            with patch("iir.cli.SECRET_PATH", secret_file):
+                exit_code = main(["dev-init"])
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(secret_file.read_text(), "DJANGO_SECRET_KEY=existing\n")
+
     def test_unknown_subcommand_exits_with_error(self):
         with patch("sys.stderr", new=StringIO()) as stderr:
             exit_code = main(["unknown"])

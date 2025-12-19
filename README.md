@@ -257,6 +257,9 @@ infer internal structure, roles, or access patterns.
 - [api](docs/api.md)  
   Internal HTTP API usage and verification examples.
 
+- [operations](docs/operations.md)
+  For advanced bootstrap or migration scenarios, see developer documentation.
+
 ---
 
 ## License
