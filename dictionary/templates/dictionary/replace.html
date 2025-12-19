@@ -1,33 +1,34 @@
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>iir Replace</title>
+    <title>{% trans "iir Replace" %}</title>
 </head>
 <body>
-    <h1>Internal Info Replacement</h1>
+    <h1>{% trans "Internal Info Replacement" %}</h1>
     <form method="post">
         {% csrf_token %}
         <div>
-            <label for="text">Input text</label><br>
+            <label for="text">{% trans "Input text" %}</label><br>
             <textarea id="text" name="text" rows="8" cols="80">{{ text }}</textarea>
         </div>
         <div>
-            <p>Categories</p>
+            <p>{% trans "Categories" %}</p>
             {% for category in categories %}
                 <label>
                     <input type="checkbox" name="categories" value="{{ category }}" {% if category in selected_categories %}checked{% endif %}>
                     {{ category }}
                 </label><br>
             {% empty %}
-                <p>No categories available yet.</p>
+                <p>{% trans "No categories available yet." %}</p>
             {% endfor %}
         </div>
         <div>
-            <button type="submit">Replace</button>
+            <button type="submit">{% trans "Replace" %}</button>
         </div>
         <div>
-            <label for="output">Output</label><br>
+            <label for="output">{% trans "Output" %}</label><br>
             <textarea id="output" name="output" rows="8" cols="80" readonly>{{ output }}</textarea>
         </div>
     </form>

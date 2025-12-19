@@ -16,11 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
-admin.site.site_header = "Management Console"
-admin.site.site_title = "Management Console"
-admin.site.index_title = "Management Console"
+admin.site.site_header = _("Management Console")
+admin.site.site_title = _("Management Console")
+admin.site.index_title = _("Management Console")
 
 urlpatterns = [
     path(
