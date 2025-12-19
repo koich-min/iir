@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "iir"
-version = "0.0.0"
+version = "0.1.7"
 description = "Internal Info Replacement CLI"
 requires-python = ">=3.12"
 dependencies = [

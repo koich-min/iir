@@ -1,11 +1,7 @@
 import os
 import sys
+from importlib import metadata
 from pathlib import Path
-
-import django
-from django.core.management import call_command
-from django.core.management.utils import get_random_secret_key
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SECRET_PATH = PROJECT_ROOT / ".env.secret"
@@ -14,7 +10,7 @@ COMMAND_MAP = {
     "replace": "replace_text",
     "add-entry": "add_entry",
 }
-AVAILABLE_SUBCOMMANDS = sorted([*COMMAND_MAP, "dev-init"])
+AVAILABLE_SUBCOMMANDS = sorted([*COMMAND_MAP, "dev-init", "version"])
 
 
 def main(argv=None):
@@ -25,6 +21,12 @@ def main(argv=None):
         return 1
 
     subcommand, *rest = argv
+    if subcommand == "--version":
+        print(f"iir {metadata.version('iir')}")
+        return 0
+    if subcommand == "version":
+        print(f"iir {metadata.version('iir')}")
+        return 0
     if subcommand == "dev-init":
         return dev_init()
 
@@ -37,6 +39,9 @@ def main(argv=None):
     # ★ 追加：Django プロジェクトルートを import path に追加
     sys.path.insert(0, str(PROJECT_ROOT))
 
+    import django
+    from django.core.management import call_command
+
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "svr.settings")
     django.setup()
 
@@ -45,6 +50,8 @@ def main(argv=None):
 
 
 def dev_init():
+    from django.core.management.utils import get_random_secret_key
+
     if SECRET_PATH.exists():
         print(".env.secret already exists, nothing to do")
         return 0
