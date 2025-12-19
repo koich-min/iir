@@ -22,6 +22,30 @@ internal information must not leak even when humans make mistakes.
 
 ---
 
+## Implementation Model
+
+iir is implemented **on top of Django** and **requires Django to function**.
+
+Django provides the execution model for:
+
+- Dictionary storage and lifecycle
+- Replacement logic consistency
+- Administrative interfaces
+- CLI, Web, API, and future MCP integrations
+
+While Django is a required dependency, it is treated as an
+**internal implementation model**:
+
+- End users are not expected to interact with Django concepts directly
+- Users are expected to interact only with the provided CLI, Web, or API interfaces
+- Developers extending or modifying iir should assume a Django-based architecture
+
+iir is designed as a **tool**, not a framework.
+Users are not expected to care about internal architecture details
+as long as the provided functionality works as documented.
+
+---
+
 ## What This Project Is NOT
 
 iir is **not** defined by a single execution model.
@@ -32,9 +56,14 @@ Although it *can* operate as a proxy in some configurations,
 The core concept is **replacement**, not mediation.
 
 iir is also **not** a redaction tool:
+
 - Data is not removed
 - Data is not masked
 - Meaning is preserved through pseudonyms
+
+Although Django is treated as an internal implementation model,
+iir is currently designed and implemented **specifically on Django**.
+Running iir without Django is not supported.
 
 ---
 
@@ -44,12 +73,16 @@ iir is also **not** a redaction tool:
 > Safety must be structural, not procedural.
 
 This project assumes:
+
 - Internal text will be copied
 - Logs will be shared
 - Commands will be piped
 - AI tools will be used
 
 The system must remain safe even when users forget to sanitize data manually.
+
+Implementation choices prioritize **reliability and consistency**
+over framework abstraction.
 
 ---
 
@@ -72,6 +105,7 @@ False positives are more dangerous than missed replacements.
 - This prevents substring collisions
 
 Example:
+
 - Replace `srv-prod-01` before `srv`
 
 ---
@@ -104,19 +138,21 @@ Pseudonyms are designed to preserve meaning, not to redact.
 iir **intentionally does not provide a reverse (de-anonymization) mechanism**.
 
 This is a deliberate security decision:
+
 - Reverse mappings encourage unsafe workflows
 - Storing or exposing reverse logic increases blast radius
 - External outputs must be treated as permanently detached from internal data
 
-If reverse lookup is required, it must occur **outside of iir** under
-strictly controlled internal procedures.
+If reverse lookup is required, it must occur **outside of iir**
+under strictly controlled internal procedures.
 
 ---
 
 ## Domains and Similar Identifiers
 
-Domain names, FQDNs, and similar identifiers are considered **internal
-information** and SHOULD be registered in the dictionary when needed.
+Domain names, FQDNs, and similar identifiers are considered
+**internal information** and SHOULD be registered in the dictionary
+when needed.
 
 They are treated as **normal dictionary entries** and follow the same rules:
 
@@ -160,79 +196,11 @@ iir supports multiple execution modes:
 - HTTP-based service
 - MCP adapter (LLM safety layer)
 
-No single execution mode defines the system.
-
-All modes share the same replacement rules and dictionary.
+All execution modes share the same replacement rules
+and the same dictionary.
 
 ---
 
 ## CLI and Django Relationship
 
-iir is implemented as a Django project internally, but:
-
-- The Django project itself is not packaged or distributed
-- The CLI entry point (`iir`) bootstraps Django explicitly
-- The project root is required at runtime
-
-This design keeps:
-- Django as an internal implementation detail
-- The CLI interface simple and stable
-
----
-
-## Security Boundaries
-
-### Dictionary Access
-
-- Dictionary data MUST NOT be exposed externally
-- Authentication is mandatory for management interfaces
-- Mapping rules must never appear in output
-
-### Replacement Logs
-
-- Logging replaced content is discouraged
-- If logging is enabled, logs MUST contain only pseudonymized data
-- Raw internal identifiers must never be logged
-
-### External Output
-
-- External output MUST NOT explicitly state that replacement occurred
-- Category-based pseudonyms provide sufficient context
-
----
-
-## Performance Philosophy
-
-Usability depends on speed.
-
-Initial implementation guidelines:
-- Prefer simple, deterministic replacement
-- Avoid premature optimization
-- Optimize only after correctness is proven
-
-Future improvements may include:
-- In-memory dictionary snapshots
-- Multi-pattern matching algorithms
-- Streaming replacements for large inputs
-
-Correctness and safety always take priority.
-
----
-
-## Contribution Rules
-
-Any change affecting replacement logic MUST include:
-
-- Tests for overlapping entries
-- Tests for substring collision prevention
-- Tests across multiple categories
-
-Changes that introduce partial matching are **not acceptable**.
-
----
-
-## Guiding Principle
-
-> Do not rely on users to remember rules.  
-> Encode safety into the system.
-
+iir is implemented as a Django-based
