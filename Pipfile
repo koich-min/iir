@@ -6,7 +6,13 @@ name = "pypi"
 [packages]
 
 [dev-packages]
+python-dotenv = "*"
 
 [requires]
 python_version = "3.12"
 python_full_version = "3.12.12"
+
+[scripts]
+django = "python -m dotenv -f .env -f .env.secret run -- python manage.py"
+dev = "pipenv run django runserver 0:8000"
+migrate = "pipenv run django migrate"
