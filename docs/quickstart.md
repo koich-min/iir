@@ -1,116 +1,156 @@
 # Quickstart – Running iir Locally (Local / Personal Mode)
 
-This document provides a minimal quickstart for running iir locally for evaluation or personal use.
+This document provides a minimal, **verified** quickstart for running **iir** locally
+for evaluation or personal use.
 
 It corresponds to the **Local / Personal Mode** described in the main README.
 
-This mode is intended for individual users and local trust boundaries.
-It does not cover containerized deployment, shared environments, or boundary-level usage.
+This guide assumes:
+- a local or private environment
+- CLI-based usage
+- no prior knowledge of Django internals
 
-This guide is intended for users who are not familiar with Django internals, but are comfortable with command-line tools.
+It focuses only on getting iir running and confirming that replacement works.
 
-It focuses only on getting iir running and performing a basic replacement.
-
-For design rationale and security constraints, see AGENTS.md.
+For design rationale and security constraints, see **AGENTS.md**.
 
 ---
 
 ## Prerequisites
 
-- Python 3.11 or newer
+- Python **3.11 or newer**
 - `git`
-- A command-line shell
-
-"Pipenv" is used in the examples below,
-but any virtual environment tool is ok.
+- `pipenv`
+- A POSIX-compatible shell (bash / zsh)
 
 ---
 
 ## Get the Code
 
-Clone the repository and enter the project directory.
+Clone the repository and enter the project directory:
 
+```sh
 git clone <repository-url>
 cd iir
+```
 
 ---
 
 ## Set up the Environment
 
-Install dependencies and activate the environment.
+Create a virtual environment and install dependencies:
 
+```sh
 pipenv install
+pipenv run pip install -e .
 pipenv shell
+```
 
-Alternatively, you may use venv/pip directly.
+At this point, the `iir` CLI command should be available.
 
-### Environment Variables (Optional)
+---
 
-For local use, the repository provides example environment templates:
+## Initialize Development Secrets
 
-- `.env.tmpl`
-- `.env.secret.tmpl`
+Generate a local development secret:
 
-These files list all supported environment variables and can be copied
-to `.env` / `.env.secret` if needed.
+```sh
+iir dev-init
+```
 
-Using these files is optional; iir can also be configured by exporting
-environment variables directly in your shell.
+This creates a `.env.secret` file in the project root.
+
+The generated file uses quoted values and is safe to load in a shell.
+
+---
+
+## Load Environment Variables
+
+Before running Django management commands, load the secret into your shell:
+
+```sh
+set -a
+source .env.secret
+set +a
+```
+
+This exports all variables defined in `.env.secret` and makes them available to Python and Django.
 
 ---
 
 ## Initialize the Database
 
-Run the database migrations.
+Run database migrations:
 
+```sh
 python manage.py migrate
+```
+
+If this completes without errors, iir is ready to use.
 
 ---
-
-At this point, iir is ready to run.
 
 ## Register Your First Entry
 
 iir does not auto-discover internal identifiers.
 All replacements are explicit and human-curated.
 
-Register an example entry using the CLI.
+Register a simple example entry:
 
+```sh
 echo "srv-prod-01" | iir add-entry HOST
+```
 
 ---
 
-## Perform a Replacement
+## Perform a Replacement (CLI)
 
-Now perform a basic replacement using stdin → stdout.
+Test replacement using stdin → stdout:
 
+```sh
 echo "connect to srv-prod-01" | iir replace
+```
 
-You should see the host name replaced with a deterministic pseudonym (e.g. Host12).
+Example output:
+
+```
+connect to Host1
+```
+
+(The number depends on your local database.)
 
 ---
 
 ## Web Replace Form (Optional)
 
-iir also provides a simple Web interface for manual inspection.
+For users who prefer a browser-based workflow, iir provides a simple Web UI.
 
 Start the development server:
 
+```sh
 python manage.py runserver
+```
 
-The web replace form is available at a known URL.
-It is intended for human verification only and is not required for normal CLI usage.
+Open the replace form in your browser:
+
+```
+http://localhost:8000/replace/
+```
+
+**Notes:**
+- The trailing slash (`/replace/`) is required
+- This interface is intended for manual inspection only
 
 ---
 
-
 ## API Access (Optional)
 
-iir exposes an authenticated HTTP API for internal use
+iir also exposes an authenticated HTTP API for internal use
 (automation, integration, or infrastructure).
 
-API usage is not required for basic operation.
-For details and verification examples, see docs/api.md.
+API usage is **not required** for basic operation.
+
+See `docs/api.md` for details and verification examples.
 
 ---
 
@@ -118,8 +158,21 @@ For details and verification examples, see docs/api.md.
 
 - Register additional entries that reflect your internal environment
 - Integrate iir into existing pipelines using the CLI
-- Review AGENTS.md for design constraints and contribution rules
+- Review **AGENTS.md** for design constraints and contribution rules
 
 When ready, you may explore other execution modes
-such as the HTTP API or MCP adapters.
+such as the HTTP API or planned MCP adapters.
+
+---
+
+### Verified Scope
+
+This quickstart has been validated with:
+
+- pipenv + editable install
+- `iir dev-init`
+- `.env.secret` shell loading
+- database migration
+- CLI replacement
+- Web replace form (`/replace/`)
 
