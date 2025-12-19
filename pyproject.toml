@@ -10,10 +10,12 @@ requires-python = ">=3.11"
 dependencies = [
   "Django==6.0",
   "djangorestframework==3.16.1",
-  "psycopg2>=2.9",
-  "mysqlclient>=2.2",
   "uvicorn>=0.30",
 ]
+
+[project.optional-dependencies]
+postgres = ["psycopg2>=2.9"]
+mysql = ["mysqlclient>=2.2"]
 
 [project.scripts]
 iir = "iir.cli:main"
