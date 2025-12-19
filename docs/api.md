@@ -17,7 +17,7 @@ for automation, integration, and infrastructure use cases.
 All API endpoints under /api/v1/ require authentication
 using Django REST Framework TokenAuthentication.
 
-- Tokens are managed internally (t.g. via Django admin)
+- Tokens are managed internally (t.g. via Management Console)
 - Tokens should be issued to dedicated internal users
 - Tokens MUST NOT be exposed outside of trusted environments
 

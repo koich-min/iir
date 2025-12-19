@@ -18,6 +18,10 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView
 
+admin.site.site_header = "Management Console"
+admin.site.site_title = "Management Console"
+admin.site.index_title = "Management Console"
+
 urlpatterns = [
     path(
         '',

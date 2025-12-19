@@ -6,7 +6,7 @@ It is intended for **developers and operators** who are responsible for
 initial setup, migration, or recovery tasks.
 
 If you are a general user, you typically do **not** need this document.
-Daily operation should be performed via the CLI or the Django admin interface.
+Daily operation should be performed via the CLI or the Management Console.
 
 ---
 
@@ -23,7 +23,7 @@ The operations described here:
 For normal usage, prefer:
 
 - CLI (`iir add-entry`)
-- Django admin site
+- Management Console
 
 ---
 
@@ -125,4 +125,3 @@ This reduces the risk of accidental large-scale changes.
 - Day-to-day dictionary management should use explicit, incremental methods
 
 If you are unsure whether you need these commands, you probably do not.
-

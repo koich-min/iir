@@ -60,15 +60,15 @@ Running it on any one Pod is sufficient.
 
 ---
 
-## 2. Accessing the Django Admin Site
+## 2. Accessing the Management Console
 
-After creating a superuser, access the admin site:
+After creating a superuser, access the Management Console:
 
 https://<your-hostname>/admin/
 
 Use the credentials created in the previous step.
 
-The admin interface is intended for:
+The Management Console is intended for:
 - dictionary management
 - internal inspection
 - limited administrative tasks
@@ -81,7 +81,7 @@ If API authentication is enabled and tokens are required,
 they should be issued manually by an administrator.
 
 This is typically done via:
-- Django admin interface
+- Management Console
 - or Django shell via kubectl exec
 
 ### Example: Enter Django shell
