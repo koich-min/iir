@@ -39,6 +39,15 @@ MCP integration does not change the core concept of iir.
 Replacement logic and safety assumptions remain the same,
 and MCP is **not required** for using iir effectively.
 
+---
+
+## Installation
+
+```sh
+pip install iir-tool
+```
+
+> Note: The PyPI package name is `iir-tool`, but the CLI command is `iir`.
 
 ---
 
