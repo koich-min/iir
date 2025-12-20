@@ -21,6 +21,10 @@ def main(argv=None):
         return 1
 
     subcommand, *rest = argv
+    if subcommand == "--help":
+        # Treat top-level help as a successful invocation (no Django init).
+        sys.stdout.write(_usage())
+        return 0
     if subcommand == "--version":
         print(f"iir {metadata.version('iir')}")
         return 0
