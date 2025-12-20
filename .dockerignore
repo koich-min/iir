@@ -9,7 +9,9 @@
 .env.secret.*
 
 # Python cache and build artifacts
+.venv/
 __pycache__/
+*.py[cod]
 *.pyc
 *.pyo
 *.pyd
@@ -28,4 +30,9 @@ docs/
 .codex/
 
 # Local databases
+*.sqlite3
 db.sqlite3
+
+# Local environment / tooling
+Pipfile
+Pipfile.lock
