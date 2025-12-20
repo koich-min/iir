@@ -15,6 +15,10 @@ dependencies = [
   "whitenoise>=6.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/koich-min/iir"
+Repository = "https://github.com/koich-min/iir"
+Issues = "https://github.com/koich-min/iir/issues"
 
 [project.optional-dependencies]
 postgres = ["psycopg2>=2.9"]
