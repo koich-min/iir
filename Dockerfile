@@ -20,13 +20,7 @@ WORKDIR /app
 COPY . /app
 
 RUN pip install --upgrade pip \
-  && pip install --no-cache-dir ".[postgres]"
-
-
-ARG DJANGO_SECRET_KEY=build-time-only
-ENV DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY
-
-RUN python manage.py collectstatic --noinput
+  && pip install --no-cache-dir "."
 
 RUN groupadd --system iir && useradd --system --gid iir --create-home iir \
   && chown -R iir:iir /app
