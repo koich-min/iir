@@ -19,8 +19,9 @@ WORKDIR /app
 
 COPY . /app
 
+ARG IIR_EXTRAS=""
 RUN pip install --upgrade pip \
-  && pip install --no-cache-dir "."
+  && pip install --no-cache-dir ".${IIR_EXTRAS}"
 
 RUN groupadd --system iir && useradd --system --gid iir --create-home iir \
   && chown -R iir:iir /app
