@@ -64,7 +64,7 @@ def dev_init():
         print("Already exists, nothing to do")
     else:
         secret = get_random_secret_key()
-        secret_path.write_text(f"DJANGO_SECRET_KEY={secret}\n")
+        secret_path.write_text(f'DJANGO_SECRET_KEY="{secret}"\n')
         print("Created .env.secret")
 
     # Django setup/migrations for dev initialization.

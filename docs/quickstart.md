@@ -1,101 +1,67 @@
-# Quickstart – Running iir Locally (Local / Personal Mode)
+# Quickstart – Running iir Locally (CLI)
 
-This document provides a minimal, **verified** quickstart for running **iir** locally
-for evaluation or personal use.
+This document provides a minimal, **verified** quickstart for running **iir**
+locally in **Local / Personal Mode**.
 
-It corresponds to the **Local / Personal Mode** described in the main README.
+It focuses only on confirming that:
 
-This guide assumes:
-- a local or private environment
-- CLI-based usage
-- no prior knowledge of Django internals
+- iir installs correctly
+- the CLI works
+- deterministic replacement behaves as expected
 
-It focuses only on getting iir running and confirming that replacement works.
+No knowledge of Django internals is required.
 
-For design rationale and security constraints, see **AGENTS.md**.
+For maintenance, inspection, or administrative workflows,
+see `docs/maintenance.md`.
 
 ---
 
 ## Prerequisites
 
 - Python **3.12 or newer**
-- `git`
-- `pipenv`
 - A POSIX-compatible shell (bash / zsh)
 
 ---
 
-## Get the Code
+## Install iir
 
-Clone the repository and enter the project directory:
+Install iir from PyPI:
 
 ```sh
-git clone <repository-url>
-cd iir
+pip install iir-tool
+```
+
+Confirm the CLI is available:
+
+```sh
+iir version
 ```
 
 ---
 
-## Set up the Environment
+## Initialize local state
 
-Create a virtual environment and install dependencies:
-
-```sh
-pipenv install
-pipenv run pip install -e .
-pipenv shell
-```
-
-At this point, the `iir` CLI command should be available.
-
----
-
-## Initialize Development Secrets
-
-Generate a local development secret:
+Before first use, initialize the local working directory:
 
 ```sh
 iir dev-init
 ```
 
-This creates a `.env.secret` file in the project root.
+This command:
 
-The generated file uses quoted values and is safe to load in a shell.
+- Creates `.env.secret` (if missing)
+- Creates `db.sqlite3` in the current directory
+- Runs database migrations
 
----
-
-## Load Environment Variables
-
-Before running Django management commands, load the secret into your shell:
-
-```sh
-set -a
-source .env.secret
-set +a
-```
-
-This exports all variables defined in `.env.secret` and makes them available to Python and Django.
+No additional setup is required.
 
 ---
 
-## Initialize the Database
+## Register your first entry
 
-Run database migrations:
+iir replaces only explicitly registered values.
 
-```sh
-python manage.py migrate
-```
-
-If this completes without errors, iir is ready to use.
-
----
-
-## Register Your First Entry
-
-iir does not auto-discover internal identifiers.
-All replacements are explicit and human-curated.
-
-Register a simple example entry:
+Add a simple example entry:
 
 ```sh
 echo "srv-prod-01" | iir add-entry HOST
@@ -103,9 +69,9 @@ echo "srv-prod-01" | iir add-entry HOST
 
 ---
 
-## Perform a Replacement (CLI)
+## Perform a replacement
 
-Test replacement using stdin → stdout:
+Run a replacement using stdin → stdout:
 
 ```sh
 echo "connect to srv-prod-01" | iir replace
@@ -113,7 +79,7 @@ echo "connect to srv-prod-01" | iir replace
 
 Example output:
 
-```
+```text
 connect to Host1
 ```
 
@@ -121,63 +87,33 @@ connect to Host1
 
 ---
 
-## Web Replace Form (Optional)
+## What’s next
 
-For users who prefer a browser-based workflow, iir provides a simple Web UI.
+You have confirmed that:
 
-Optional (once before using the web UI locally):
+- iir is installed correctly
+- the CLI works
+- replacement is deterministic
 
-```sh
-pipenv run django collectstatic
-```
+From here, you may:
 
-Start the development server:
+- Register additional entries
+- Integrate iir into scripts or pipelines
+- Explore maintenance and inspection workflows
 
-```sh
-python manage.py runserver
-```
+For administrative tasks such as entry inspection, correction,
+or Django Admin usage, see:
 
-Open the replace form in your browser:
-
-```
-http://localhost:8000/replace/
-```
-
-**Notes:**
-- The trailing slash (`/replace/`) is required
-- This interface is intended for manual inspection only
+- `docs/maintenance.md`
 
 ---
 
-## API Access (Optional)
-
-iir also exposes an authenticated HTTP API for internal use
-(automation, integration, or infrastructure).
-
-API usage is **not required** for basic operation.
-
-See `docs/api.md` for details and verification examples.
-
----
-
-## Next Steps
-
-- Register additional entries that reflect your internal environment
-- Integrate iir into existing pipelines using the CLI
-- Review **AGENTS.md** for design constraints and contribution rules
-
-When ready, you may explore other execution modes
-such as the HTTP API or planned MCP adapters.
-
----
-
-### Verified Scope
+## Verified scope
 
 This quickstart has been validated with:
 
-- pipenv + editable install
+- `pip install iir-tool`
 - `iir dev-init`
-- `.env.secret` shell loading
-- database migration
-- CLI replacement
-- Web replace form (`/replace/`)
+- CLI-based entry registration
+- CLI-based replacement
+
