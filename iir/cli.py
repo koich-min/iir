@@ -25,10 +25,10 @@ def main(argv=None):
         sys.stdout.write(_usage())
         return 0
     if subcommand == "--version":
-        print(f"iir {metadata.version('iir')}")
+        print(f"iir {metadata.version('iir-tool')}")
         return 0
     if subcommand == "version":
-        print(f"iir {metadata.version('iir')}")
+        print(f"iir {metadata.version('iir-tool')}")
         return 0
     if subcommand == "dev-init":
         return dev_init()
