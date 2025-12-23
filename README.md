@@ -87,7 +87,61 @@ Examples:
 
 ## Basic Usage (CLI, Recommended)
 
+## Development initialization (`dev-init` / `dev-remove`)
+
+For local development and evaluation, iir provides explicit helper commands
+to initialize and clean up the working directory.
+
+### `iir dev-init`
+
 ```sh
+iir dev-init
+```
+
+This command performs the following actions **in the current directory**:
+
+- Creates `.env.secret` if it does not already exist  
+  (contains `DJANGO_SECRET_KEY` for local use)
+- Creates `db.sqlite3` in the current directory (SQLite)
+- Runs Django migrations against that database
+
+After running `dev-init`, the directory will contain:
+
+```text
+.env.secret
+db.sqlite3
+```
+
+These files are **local development artifacts** and should normally be
+excluded from version control.
+
+### `iir dev-remove`
+
+```sh
+iir dev-remove
+```
+
+This command removes `.env.secret` from the current directory.
+
+Notes:
+
+- `dev-remove` does **not** delete `db.sqlite3`
+- Database removal is intentionally left to the user
+- This avoids accidental data loss
+
+### Important notes
+
+- `dev-init` and `dev-remove` are **explicit developer helpers**
+- iir will **never** create or migrate databases implicitly during
+  normal commands such as `replace`
+- Database initialization is always a deliberate action
+
+This design keeps database state predictable and avoids unintended
+side effects.
+
+
+```sh
+echo "my.domain" | iir add-entry DOMAIN
 echo "connect to my.domain" | iir replace
 ```
 
