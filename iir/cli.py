@@ -4,13 +4,12 @@ from importlib import metadata
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-SECRET_PATH = PROJECT_ROOT / ".env.secret"
 
 COMMAND_MAP = {
     "replace": "replace_text",
     "add-entry": "add_entry",
 }
-AVAILABLE_SUBCOMMANDS = sorted([*COMMAND_MAP, "dev-init", "version"])
+AVAILABLE_SUBCOMMANDS = sorted([*COMMAND_MAP, "dev-init", "dev-remove", "version"])
 
 
 def main(argv=None):
@@ -33,6 +32,8 @@ def main(argv=None):
         return 0
     if subcommand == "dev-init":
         return dev_init()
+    if subcommand == "dev-remove":
+        return dev_remove()
 
     command = COMMAND_MAP.get(subcommand)
     if command is None:
@@ -46,6 +47,8 @@ def main(argv=None):
     import django
     from django.core.management import call_command
 
+    _load_secret_from_cwd()
+    _set_sqlite_path()
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "svr.settings")
     django.setup()
 
@@ -56,14 +59,65 @@ def main(argv=None):
 def dev_init():
     from django.core.management.utils import get_random_secret_key
 
-    if SECRET_PATH.exists():
-        print(".env.secret already exists, nothing to do")
-        return 0
+    secret_path = _cwd_secret_path()
+    if secret_path.exists():
+        print("Already exists, nothing to do")
+    else:
+        secret = get_random_secret_key()
+        secret_path.write_text(f"DJANGO_SECRET_KEY={secret}\n")
+        print("Created .env.secret")
 
-    secret = get_random_secret_key()
-    SECRET_PATH.write_text(f"DJANGO_SECRET_KEY=\"{secret}\"\n")
-    print("Created .env.secret with DJANGO_SECRET_KEY")
+    # Django setup/migrations for dev initialization.
+    sys.path.insert(0, str(PROJECT_ROOT))
+    import django
+    from django.core.management import call_command
+
+    _load_secret_from_cwd()
+    _set_sqlite_path()
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "svr.settings")
+    django.setup()
+    call_command("migrate", interactive=False, verbosity=0)
     return 0
+
+
+def dev_remove():
+    secret_path = _cwd_secret_path()
+    if not secret_path.exists():
+        print("No .env.secret found")
+        return 0
+    secret_path.unlink()
+    print("Removed .env.secret")
+    return 0
+
+
+def _cwd_secret_path():
+    return Path.cwd() / ".env.secret"
+
+
+def _load_secret_from_cwd():
+    if os.environ.get("DJANGO_SECRET_KEY"):
+        return
+
+    secret_path = _cwd_secret_path()
+    if not secret_path.exists():
+        return
+
+    for line in secret_path.read_text().splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if not stripped.startswith("DJANGO_SECRET_KEY="):
+            continue
+        _, value = stripped.split("=", 1)
+        if value:
+            os.environ["DJANGO_SECRET_KEY"] = value
+        return
+
+
+def _set_sqlite_path():
+    db_engine = os.environ.get("DB_ENGINE", "sqlite").lower()
+    if db_engine == "sqlite":
+        os.environ.setdefault("SQLITE_PATH", str(Path.cwd() / "db.sqlite3"))
 
 
 def _usage():
