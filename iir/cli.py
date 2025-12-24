@@ -9,7 +9,9 @@ COMMAND_MAP = {
     "replace": "replace_text",
     "add-entry": "add_entry",
 }
-AVAILABLE_SUBCOMMANDS = sorted([*COMMAND_MAP, "dev-init", "dev-remove", "version"])
+AVAILABLE_SUBCOMMANDS = sorted(
+    [*COMMAND_MAP, "api", "dev-init", "dev-remove", "version"]
+)
 
 
 def main(argv=None):
@@ -34,6 +36,8 @@ def main(argv=None):
         return dev_init()
     if subcommand == "dev-remove":
         return dev_remove()
+    if subcommand == "api":
+        return api_command(rest)
 
     command = COMMAND_MAP.get(subcommand)
     if command is None:
@@ -102,6 +106,47 @@ def dev_remove():
         return 0
     secret_path.unlink()
     print("Removed .env.secret")
+    return 0
+
+
+def api_command(args):
+    if not args:
+        sys.stderr.write("Usage: iir api <subcommand> [options]\n")
+        return 1
+
+    subcommand, *rest = args
+    if subcommand == "create-token":
+        return create_token(rest)
+
+    sys.stderr.write(f"Unknown api subcommand: {subcommand}\n")
+    sys.stderr.write("Usage: iir api create-token <username>\n")
+    return 1
+
+
+def create_token(args):
+    if len(args) != 1:
+        sys.stderr.write("Usage: iir create-token <username>\n")
+        return 1
+
+    username = args[0]
+
+    sys.path.insert(0, str(PROJECT_ROOT))
+    import django
+    from django.contrib.auth import get_user_model
+    from rest_framework.authtoken.models import Token
+
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "svr.settings")
+    django.setup()
+
+    User = get_user_model()
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        sys.stderr.write(f"User does not exist: {username}\n")
+        return 1
+
+    token, _ = Token.objects.get_or_create(user=user)
+    sys.stdout.write(f"{token.key}\n")
     return 0
 
 
