@@ -59,13 +59,28 @@ def main(argv=None):
 def dev_init():
     from django.core.management.utils import get_random_secret_key
 
-    secret_path = _cwd_secret_path()
+    data_dir = os.environ.get("DATA_DIR")
+    if data_dir:
+        data_path = Path(data_dir)
+        if not data_path.exists():
+            sys.stderr.write(f"DATA_DIR does not exist: {data_dir}\n")
+            return 1
+        if not data_path.is_dir():
+            sys.stderr.write(f"DATA_DIR is not a directory: {data_dir}\n")
+            return 1
+        secret_path = data_path / ".env.secret"
+        sqlite_path = data_path / "db.sqlite3"
+    else:
+        secret_path = _cwd_secret_path()
+        sqlite_path = None
     if secret_path.exists():
         print("Already exists, nothing to do")
     else:
         secret = get_random_secret_key()
         secret_path.write_text(f'DJANGO_SECRET_KEY="{secret}"\n')
         print("Created .env.secret")
+    if sqlite_path is not None:
+        sqlite_path.touch(exist_ok=True)
 
     # Django setup/migrations for dev initialization.
     sys.path.insert(0, str(PROJECT_ROOT))

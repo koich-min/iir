@@ -37,7 +37,13 @@ Container / Shared Mode follows these principles:
 
 ## Deployment Overview
 
-In Container / Shared Mode, iir is typically deployed as a stateless service with an external database.
+While Container / Shared Mode is typically deployed with an external database
+(PostgreSQL or MySQL), a SQLite-based setup may be used for evaluation,
+testing, or small-scale shared environments.
+
+In such cases, the database location must be explicitly configured
+via environment variables and persistent storage.
+
 
 Common components:
 
@@ -59,6 +65,19 @@ DB_USER=iir
 DB_PASSWORD=secret
 DB_HOST=db-postgres
 DB_PORT=5432
+
+### SQLite-based configuration (minimal setup)
+
+For evaluation or small shared deployments, SQLite may be used.
+
+In this case, the database location must be explicitly specified:
+
+```text
+DB_ENGINE=sqlite
+SQLITE_PATH=/data/db.sqlite3
+```
+
+The database path must be backed by persistent storage.
 
 ---
 
@@ -118,3 +137,4 @@ Container / Shared Mode complements Local / Personal Mode:
 Do not attempt to use Container Mode as a replacement for Local Mode workflows.
 
 They are complementary, not interchangeable.
+

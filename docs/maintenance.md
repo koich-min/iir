@@ -29,14 +29,22 @@ with those assumptions in mind.
 iir dev-init
 ```
 
-This command performs the following actions **in the current directory**:
+This command performs the following actions in a **local state directory**:
 
 - Creates `.env.secret` if it does not already exist  
   (contains `DJANGO_SECRET_KEY`, written with shell-safe quoting)
-- Creates `db.sqlite3` in the current directory
+- Creates `db.sqlite3`
 - Runs Django migrations against that database
 
-After running `dev-init`, the directory will contain:
+### State directory resolution
+
+- If `DATA_DIR` is **not set**:
+  - The current working directory is used
+- If `DATA_DIR` **is set**:
+  - That directory is used as the state directory
+  - The directory **must already exist**
+
+After running `dev-init`, the state directory will contain:
 
 ```text
 .env.secret
@@ -69,8 +77,12 @@ Notes:
 
 When using SQLite (default):
 
-- The database file is `db.sqlite3` in the current directory
-- Django maintenance commands must use the same database via `SQLITE_PATH`
+- The database file is `db.sqlite3` in the **state directory**
+- The state directory is determined by:
+  - `DATA_DIR` if set
+  - otherwise the current working directory
+
+Django maintenance commands must use the same database via `SQLITE_PATH`.
 
 ---
 
@@ -85,7 +97,8 @@ Before running any Django command, export environment variables:
 set -a
 source .env.secret
 set +a
-export SQLITE_PATH="$(pwd)/db.sqlite3"
+
+export SQLITE_PATH="${DATA_DIR:-$(pwd)}/db.sqlite3"
 ```
 
 ---
@@ -161,7 +174,7 @@ Notes:
 
 ## Summary
 
-- `iir dev-init` creates an explicit local development state
+- `iir dev-init` creates an explicit local development state directory
 - Normal CLI usage does not modify database structure
 - Django Admin is the supported interface for maintenance
 - Entry deletion or deactivation is an operational choice

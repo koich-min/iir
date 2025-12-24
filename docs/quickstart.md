@@ -53,6 +53,11 @@ This command:
 - Creates `db.sqlite3` in the current directory
 - Runs database migrations
 
+Note:
+If the environment variable `DATA_DIR` is set, iir will use that directory
+instead of the current working directory to store local state.
+This is primarily intended for container-based or non-interactive workflows.
+
 No additional setup is required.
 
 ---
