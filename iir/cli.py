@@ -10,7 +10,7 @@ COMMAND_MAP = {
     "add-entry": "add_entry",
 }
 AVAILABLE_SUBCOMMANDS = sorted(
-    [*COMMAND_MAP, "api", "dev-init", "dev-remove", "version"]
+    [*COMMAND_MAP, "admin", "api", "dev-init", "dev-remove", "version"]
 )
 
 
@@ -36,6 +36,8 @@ def main(argv=None):
         return dev_init()
     if subcommand == "dev-remove":
         return dev_remove()
+    if subcommand == "admin":
+        return admin_command(rest)
     if subcommand == "api":
         return api_command(rest)
 
@@ -121,6 +123,27 @@ def api_command(args):
     sys.stderr.write(f"Unknown api subcommand: {subcommand}\n")
     sys.stderr.write("Usage: iir api create-token <username>\n")
     return 1
+
+
+def admin_command(args):
+    if not args:
+        sys.stderr.write("Usage: iir admin <subcommand> [options]\n")
+        return 1
+
+    subcommand, *rest = args
+    if subcommand not in {"createsuperuser", "collectstatic"}:
+        sys.stderr.write(f"Unknown admin subcommand: {subcommand}\n")
+        sys.stderr.write("Usage: iir admin createsuperuser|collectstatic [options]\n")
+        return 1
+
+    sys.path.insert(0, str(PROJECT_ROOT))
+    import django
+    from django.core.management import call_command
+
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "svr.settings")
+    django.setup()
+    call_command(subcommand, *rest)
+    return 0
 
 
 def create_token(args):
