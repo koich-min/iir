@@ -3,7 +3,7 @@
 This document describes the internal HTTP API provided by iir
 for replacement and operational health checks.
 
-This API is INTENDED FOR INTERNAL USE ONLY.
+This API is intended for internal or private environments only.
 It is not designed as a public service or external integration API.
 
 The primary and recommended interface for iir
@@ -17,7 +17,7 @@ for automation, integration, and infrastructure use cases.
 All API endpoints under /api/v1/ require authentication
 using Django REST Framework TokenAuthentication.
 
-- Tokens are managed internally (t.g. via Management Console)
+- Tokens are managed internally (e.g. via Management Console or `iir api create-token`)
 - Tokens should be issued to dedicated internal users
 - Tokens MUST NOT be exposed outside of trusted environments
 
@@ -85,7 +85,7 @@ Response (JSON):
 
 ## Categories API 
 
-**GET ?api/v1/categories**
+**GET /api/v1/categories**
 
 Returns available category labels from active entries.
 
