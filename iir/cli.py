@@ -50,14 +50,13 @@ def main(argv=None):
     # ★ 追加：Django プロジェクトルートを import path に追加
     sys.path.insert(0, str(PROJECT_ROOT))
 
-    import django
-    from django.core.management import call_command
-
-    _load_secret_from_cwd()
-    _set_sqlite_path()
+    if _bootstrap_local_state() != 0:
+        return 1
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "svr.settings")
+    import django
     django.setup()
 
+    from django.core.management import call_command
     call_command(command, *rest)
     return 0
 
@@ -131,35 +130,54 @@ def admin_command(args):
         return 1
 
     subcommand, *rest = args
-    if subcommand not in {"createsuperuser", "collectstatic"}:
+    if subcommand not in {"createsuperuser", "collectstatic", "runserver"}:
         sys.stderr.write(f"Unknown admin subcommand: {subcommand}\n")
-        sys.stderr.write("Usage: iir admin createsuperuser|collectstatic [options]\n")
+        sys.stderr.write(
+            "Usage: iir admin createsuperuser|collectstatic|runserver [options]\n"
+        )
         return 1
 
     sys.path.insert(0, str(PROJECT_ROOT))
-    import django
-    from django.core.management import call_command
-
+    if _bootstrap_local_state() != 0:
+        return 1
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "svr.settings")
+    import django
     django.setup()
+
+    if subcommand == "runserver":
+        try:
+            host, port = _parse_addrport(rest)
+        except ValueError as exc:
+            sys.stderr.write(f"{exc}\n")
+            sys.stderr.write("Usage: iir admin runserver [addrport]\n")
+            return 1
+
+        import uvicorn
+
+        uvicorn.run("svr.asgi:application", host=host, port=port)
+        return 0
+
+    from django.core.management import call_command
     call_command(subcommand, *rest)
     return 0
 
 
 def create_token(args):
     if len(args) != 1:
-        sys.stderr.write("Usage: iir create-token <username>\n")
+        sys.stderr.write("Usage: iir api create-token <username>\n")
         return 1
 
     username = args[0]
 
     sys.path.insert(0, str(PROJECT_ROOT))
+    if _bootstrap_local_state() != 0:
+        return 1
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "svr.settings")
     import django
+    django.setup()
+
     from django.contrib.auth import get_user_model
     from rest_framework.authtoken.models import Token
-
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "svr.settings")
-    django.setup()
 
     User = get_user_model()
     try:
@@ -201,6 +219,71 @@ def _set_sqlite_path():
     db_engine = os.environ.get("DB_ENGINE", "sqlite").lower()
     if db_engine == "sqlite":
         os.environ.setdefault("SQLITE_PATH", str(Path.cwd() / "db.sqlite3"))
+
+
+def _bootstrap_local_state():
+    state_dir = None
+    if not os.environ.get("DJANGO_SECRET_KEY"):
+        state_dir = _state_dir()
+        if state_dir is None:
+            return 1
+        secret_path = state_dir / ".env.secret"
+        if secret_path.exists():
+            for line in secret_path.read_text().splitlines():
+                stripped = line.strip()
+                if not stripped or stripped.startswith("#"):
+                    continue
+                if not stripped.startswith("DJANGO_SECRET_KEY="):
+                    continue
+                _, value = stripped.split("=", 1)
+                if value:
+                    os.environ["DJANGO_SECRET_KEY"] = value
+                break
+
+    db_engine = os.environ.get("DB_ENGINE", "sqlite").lower()
+    if db_engine == "sqlite" and not os.environ.get("SQLITE_PATH"):
+        if state_dir is None:
+            state_dir = _state_dir()
+            if state_dir is None:
+                return 1
+        os.environ.setdefault("SQLITE_PATH", str(state_dir / "db.sqlite3"))
+    return 0
+
+
+def _state_dir():
+    data_dir = os.environ.get("DATA_DIR")
+    if not data_dir:
+        return Path.cwd()
+
+    data_path = Path(data_dir)
+    if not data_path.exists():
+        sys.stderr.write(f"DATA_DIR does not exist: {data_dir}\n")
+        return None
+    if not data_path.is_dir():
+        sys.stderr.write(f"DATA_DIR is not a directory: {data_dir}\n")
+        return None
+    return data_path
+
+
+def _parse_addrport(args):
+    if not args:
+        return "127.0.0.1", 8000
+    if len(args) != 1:
+        raise ValueError("runserver accepts at most one addr:port argument")
+
+    addrport = args[0]
+    if addrport.isdigit():
+        return "127.0.0.1", int(addrport)
+
+    if ":" not in addrport:
+        raise ValueError("addrport must be in the form host:port")
+
+    host, port_str = addrport.rsplit(":", 1)
+    if not host:
+        raise ValueError("addrport must include a host")
+    if not port_str.isdigit():
+        raise ValueError("port must be a number")
+    return host, int(port_str)
 
 
 def _usage():

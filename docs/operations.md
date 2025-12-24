@@ -1,12 +1,48 @@
 # Operations Guide (Advanced)
 
-This document describes **advanced operational tasks** for iir.
+This document describes **advanced and low-level operational tasks** for iir.
 
 It is intended for **developers and operators** who are responsible for
-initial setup, migration, or recovery tasks.
+environment bootstrap, data migration, backup, or recovery.
+
+⚠️ **This document intentionally covers operations that are *not* exposed via the iir CLI.**
 
 If you are a general user, you typically do **not** need this document.
-Daily operation should be performed via the CLI or the Management Console.
+Day-to-day operation should be performed via:
+
+- CLI (`iir add-entry`, `iir replace`)
+- Administrative CLI (`iir admin`, `iir api`)
+- Management Console (Django Admin)
+
+---
+
+## Positioning and Responsibility
+
+This document exists to describe **bulk, destructive, or exceptional operations**
+that are intentionally kept **outside** the normal CLI surface.
+
+### What belongs here
+
+- Bulk data export or import
+- Full dictionary backup and restore
+- Environment bootstrap or recovery
+- Controlled testing of deployment procedures
+
+### What does *not* belong here
+
+If an operation can be performed via:
+
+- `iir add-entry`
+- `iir replace`
+- `iir admin`
+- `iir api`
+
+it does **not** belong in this document.
+
+Those operations are covered by:
+
+- `docs/quickstart.md`
+- `docs/maintenance.md`
 
 ---
 
@@ -20,7 +56,7 @@ The operations described here:
 
 ⚠️ **These commands should only be used by operators who understand the impact.**
 
-For normal usage, prefer:
+For normal usage, always prefer:
 
 - CLI (`iir add-entry`)
 - Management Console
@@ -35,7 +71,7 @@ Typical scenarios include:
 - Migrating dictionary data between environments
 - Creating a controlled backup
 - Restoring data after accidental deletion
-- Testing deployment procedures
+- Testing deployment or recovery procedures
 
 ---
 
@@ -46,9 +82,9 @@ For backup purposes, Django provides a built-in export mechanism.
 
 This creates a **structured snapshot** of the dictionary data.
 
-Example (run inside the container or pod):
+Example (run inside the container, pod, or a controlled environment):
 
-```
+```sh
 python manage.py dumpdata dictionary --indent 2 > dictionary.json
 ```
 
@@ -66,7 +102,7 @@ Store the resulting file securely.
 
 To restore dictionary data from a backup file:
 
-```
+```sh
 python manage.py loaddata dictionary.json
 ```
 
@@ -125,3 +161,4 @@ This reduces the risk of accidental large-scale changes.
 - Day-to-day dictionary management should use explicit, incremental methods
 
 If you are unsure whether you need these commands, you probably do not.
+

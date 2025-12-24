@@ -1,9 +1,9 @@
 # Maintenance Guide
 
-This document describes **maintenance and inspection workflows** for iir.
-It is intended for **developers and operators**, not for everyday CLI usage.
+This document describes **maintenance and administrative workflows** for iir.
 
-If you only want to try iir quickly, see `docs/quickstart.md` instead.
+It is intended for **developers and operators**, not for everyday CLI usage.
+If you only want to try iir quickly, see `docs/quickstart.md`.
 
 ---
 
@@ -18,8 +18,8 @@ As a result:
 - Meaning degradation is expected and accepted
 - Operational responsibility lies with the operator
 
-This document explains how to perform maintenance tasks
-with those assumptions in mind.
+This document explains **explicit, operator-driven actions**
+that are intentionally **not automated**.
 
 ---
 
@@ -29,7 +29,9 @@ with those assumptions in mind.
 iir dev-init
 ```
 
-This command performs the following actions in a **local state directory**:
+This command initializes a **local state directory** for iir.
+
+It performs the following actions:
 
 - Creates `.env.secret` if it does not already exist  
   (contains `DJANGO_SECRET_KEY`, written with shell-safe quoting)
@@ -51,7 +53,7 @@ After running `dev-init`, the state directory will contain:
 db.sqlite3
 ```
 
-These files are **local development artifacts** and should not be committed.
+These files are **local development artifacts** and must not be committed.
 
 ---
 
@@ -68,7 +70,7 @@ DJANGO_SECRET_KEY="random-secret-value"
 Notes:
 
 - Values are **double-quoted** to remain safe when sourced by a shell
-- The file is intended for **local use only**
+- The file is intended for **local or controlled use only**
 - iir CLI commands load this file automatically when required
 
 ---
@@ -82,48 +84,62 @@ When using SQLite (default):
   - `DATA_DIR` if set
   - otherwise the current working directory
 
-Django maintenance commands must use the same database via `SQLITE_PATH`.
-
----
-
-## Django maintenance commands
-
-Django management commands are used **only for maintenance tasks**,
-such as inspection, correction, or cleanup of dictionary entries.
-
-Before running any Django command, export environment variables:
+Django maintenance commands must use the same database via `SQLITE_PATH`:
 
 ```sh
-set -a
-source .env.secret
-set +a
-
 export SQLITE_PATH="${DATA_DIR:-$(pwd)}/db.sqlite3"
 ```
 
 ---
 
-### Create admin user
+## Administrative commands (CLI)
+
+Administrative actions are intentionally **explicit and operator-driven**.
+
+They define trust boundaries and therefore are **not automated**.
+
+### Create an admin user
 
 ```sh
-DJANGO_SETTINGS_MODULE=svr.settings python -m django createsuperuser
+iir admin createsuperuser
 ```
+
+Notes:
+
+- Interactive by design
+- Writes directly to the configured database
+- No credentials are stored in images or manifests
 
 ---
 
 ### Collect static files (Admin UI)
 
 ```sh
-DJANGO_SETTINGS_MODULE=svr.settings python -m django collectstatic
+iir admin collectstatic --noinput
 ```
+
+This is required when:
+
+- Running Django Admin
+- Static files are not baked into the image
+- Using shared or container-based environments
 
 ---
 
-### Run Django development server
+### Run a local admin server
 
 ```sh
-DJANGO_SETTINGS_MODULE=svr.settings python -m django runserver
+iir admin runserver
 ```
+
+Optional address/port may be provided:
+
+```sh
+iir admin runserver 0.0.0.0:8000
+```
+
+This command launches the application via **uvicorn**
+while preserving Django-compatible CLI syntax.
 
 The Admin interface is available at:
 
@@ -131,52 +147,73 @@ The Admin interface is available at:
 http://127.0.0.1:8000/admin/
 ```
 
-This server is intended for **local, non-public use only**.
+This server is intended for **local or controlled environments only**.
+
+---
+
+## API token management
+
+If API authentication is enabled, tokens must be issued explicitly.
+
+### Create an API token
+
+```sh
+iir api create-token <username>
+```
+
+Notes:
+
+- The user must already exist
+- Tokens are printed to stdout
+- Token issuance is a deliberate administrative action
+
+This replaces manual token creation via Django shell.
+
+---
+
+## CLI vs maintenance responsibilities
+
+- **CLI (`iir add-entry`, `iir replace`)**
+  - Safe, incremental, append-style operations
+- **Maintenance (this document)**
+  - Administrative and trust-boundary operations
+
+If an action can be performed via the normal CLI,
+it does **not** belong in this document.
 
 ---
 
 ## Handling dictionary entries
 
-### CLI vs maintenance responsibilities
-
-- Adding entries and running replacements are performed via the **iir CLI**
-- Inspection, correction, and cleanup are performed via **Django Admin**
-
-The CLI is intentionally limited to **append-style operations**.
-
----
-
-### Mistaken or obsolete entries
-
 Dictionary entries may be **edited or deleted via Django Admin**.
 
-In many cases, disabling an entry by setting `is_active = False`
-is sufficient and convenient.
+Common approaches:
 
-Physical deletion is also permitted and left to **operator discretion**.
+- Logical deletion (`is_active = False`)
+- Physical deletion (operator discretion)
 
 Notes:
 
 - iir does not guarantee explainability of past outputs
-- Semantic degradation is already inherent to the replacement model
-- Decisions about history retention are an **operational concern**
+- Semantic degradation is already inherent to the model
+- History retention is an **operational decision**
 
 ---
 
 ## Design notes
 
-- iir prioritizes simplicity and determinism over semantic fidelity
-- The dictionary database is treated as an internal operational asset
-- No reverse (de-anonymization) mechanism is provided by design
-- Maintenance actions are explicit and operator-driven
+- iir prioritizes determinism and structural safety
+- Administrative actions are explicit and auditable
+- No reverse (de-anonymization) mechanism is provided
+- The dictionary database is a sensitive internal asset
 
 ---
 
 ## Summary
 
-- `iir dev-init` creates an explicit local development state directory
-- Normal CLI usage does not modify database structure
-- Django Admin is the supported interface for maintenance
-- Entry deletion or deactivation is an operational choice
-- iir provides structure; operators provide judgment
+- `iir dev-init` creates an explicit local state directory
+- Administrative actions are performed via explicit CLI commands
+- Django Admin is the supported interface for inspection and correction
+- API tokens are issued intentionally and manually
+- Convenience is traded for clarity and safety
 

@@ -112,9 +112,9 @@ For details, see:
 - [Maintenance guide](docs/maintenance.md)
 
 > Note:
-> For advanced or container-based workflows, iir can store its local state
-> in a directory specified by the `DATA_DIR` environment variable.
-> See the maintenance and container mode documentation for details.
+> For advanced or non-interactive local workflows, iir can store its local
+> state in a directory specified by the `DATA_DIR` environment variable.
+> See the maintenance documentation for details.
 
 ---
 
