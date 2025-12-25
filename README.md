@@ -39,7 +39,9 @@ and MCP is **not required** for using iir effectively.
 
 ---
 
-## Installation
+## Installation (CLI)
+
+Install iir from PyPI:
 
 ```sh
 pip install iir-tool
@@ -53,7 +55,7 @@ pip install iir-tool
 
 ### 1. Local / personal mode (CLI-first)
 
-Designed for individual users and local workflows.
+This mode assumes **direct CLI usage after installing iir via PyPI**.
 
 Typical use cases:
 
@@ -64,8 +66,8 @@ Typical use cases:
 Characteristics:
 
 - CLI-first design (stdin → stdout)
-- Simple installation
-- No external services required
+- Local execution
+- No container runtime required
 
 ---
 
@@ -84,12 +86,41 @@ This mode is **not designed for public exposure**.
 
 ---
 
+### 3. Container-based evaluation (Docker)
+
+iir can also be evaluated using the official Docker image.
+This mode is intended for **local or private evaluation**, not public exposure.
+
+Docker usage differs from direct CLI usage in that:
+
+- Commands are executed via `python -m iir`
+- State is stored in a volume-mounted directory
+- Django lifecycle operations are **explicit and manual**
+
+For the verified Docker evaluation flow, see:
+
+- `docs/quickstart.md`
+
+---
+
 ## Basic usage (CLI)
+
+This section describes **local CLI usage after installing iir via PyPI**.
+It assumes a **direct CLI environment**, not Docker.
 
 Before using iir for the first time, initialize the local working directory:
 
 ```sh
 iir dev-init
+```
+
+This command only prepares local state files (such as `.env.secret`).
+It does **not** run database migrations.
+
+After initialization, you must explicitly run database migrations:
+
+```sh
+iir admin migrate
 ```
 
 Then register entries and run replacement:
@@ -98,6 +129,10 @@ Then register entries and run replacement:
 echo "my.domain" | iir add-entry DOMAIN
 echo "connect to my.domain" | iir replace
 ```
+
+> Note:
+> When running iir via Docker, the initialization and migration steps
+> are different. Refer to `docs/quickstart.md` for Docker-specific instructions.
 
 ---
 
@@ -112,9 +147,9 @@ For details, see:
 - [Maintenance guide](docs/maintenance.md)
 
 > Note:
-> For advanced or non-interactive local workflows, iir can store its local
-> state in a directory specified by the `DATA_DIR` environment variable.
-> See the maintenance documentation for details.
+> iir can store its local state in a directory specified by the `DATA_DIR`
+> environment variable. This is required for container-based workflows and
+> optional for direct CLI usage.
 
 ---
 
