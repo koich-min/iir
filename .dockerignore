@@ -36,3 +36,6 @@ db.sqlite3
 # Local environment / tooling
 Pipfile
 Pipfile.lock
+
+# Collected static files (should never be baked into the image)
+staticfiles/

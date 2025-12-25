@@ -4,20 +4,22 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app
 
-# minimal system deps
+# system deps + PostgreSQL client
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
         ca-certificates \
-        curl; \
+        curl \
+        libpq-dev; \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY . /app
 
-# Python deps (from pyproject.toml via pip-compile)
+# Python deps
 RUN pip install --upgrade pip \
- && pip install --no-cache-dir -r requirements.txt
+ && pip install --no-cache-dir -r requirements.txt \
+ && pip install --no-cache-dir psycopg2-binary
 
 # non-root execution
 RUN groupadd --system iir \

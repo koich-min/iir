@@ -86,17 +86,6 @@ def dev_init():
         print("Created .env.secret")
     if sqlite_path is not None:
         sqlite_path.touch(exist_ok=True)
-
-    # Django setup/migrations for dev initialization.
-    sys.path.insert(0, str(PROJECT_ROOT))
-    import django
-    from django.core.management import call_command
-
-    _load_secret_from_cwd()
-    _set_sqlite_path()
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "svr.settings")
-    django.setup()
-    call_command("migrate", interactive=False, verbosity=0)
     return 0
 
 
@@ -130,14 +119,17 @@ def admin_command(args):
         return 1
 
     subcommand, *rest = args
-    if subcommand not in {"createsuperuser", "collectstatic", "runserver"}:
+    if subcommand not in {"createsuperuser", "collectstatic", "migrate", "runserver"}:
         sys.stderr.write(f"Unknown admin subcommand: {subcommand}\n")
         sys.stderr.write(
-            "Usage: iir admin createsuperuser|collectstatic|runserver [options]\n"
+            "Usage: iir admin createsuperuser|collectstatic|migrate|runserver [options]\n"
         )
         return 1
 
     sys.path.insert(0, str(PROJECT_ROOT))
+    if subcommand == "migrate":
+        return admin_migrate(rest)
+
     if _bootstrap_local_state() != 0:
         return 1
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "svr.settings")
@@ -159,6 +151,51 @@ def admin_command(args):
 
     from django.core.management import call_command
     call_command(subcommand, *rest)
+    return 0
+
+
+def admin_migrate(args):
+    if args:
+        sys.stderr.write("Usage: iir admin migrate\n")
+        return 1
+
+    state_dir = _state_dir()
+    if state_dir is None:
+        return 1
+
+    sys.stdout.write(f"Using state directory: {state_dir}\n")
+
+    env_path = state_dir / ".env.secret"
+    sys.stdout.write(f"Loading env file: {env_path}\n")
+    if not env_path.exists():
+        sys.stderr.write("Error: .env.secret not found in state directory.\n")
+        sys.stderr.write("Please run `iir dev-init` first.\n")
+        return 1
+
+    _load_secret_from_path(env_path)
+    if not os.environ.get("DJANGO_SECRET_KEY"):
+        sys.stderr.write("Error: DJANGO_SECRET_KEY is not set.\n")
+        return 1
+
+    db_engine = os.environ.get("DB_ENGINE", "sqlite").lower()
+    if db_engine == "sqlite" and not os.environ.get("SQLITE_PATH"):
+        os.environ.setdefault("SQLITE_PATH", str(state_dir / "db.sqlite3"))
+
+    sys.stdout.write("Running database migrations...\n")
+
+    sys.path.insert(0, str(PROJECT_ROOT))
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "svr.settings")
+    import django
+    django.setup()
+
+    from django.core.management import call_command
+    try:
+        call_command("migrate")
+    except Exception as exc:
+        sys.stderr.write(f"{exc}\n")
+        return 1
+
+    sys.stdout.write("Migration completed successfully.\n")
     return 0
 
 
@@ -248,6 +285,19 @@ def _bootstrap_local_state():
                 return 1
         os.environ.setdefault("SQLITE_PATH", str(state_dir / "db.sqlite3"))
     return 0
+
+
+def _load_secret_from_path(secret_path):
+    for line in secret_path.read_text().splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if not stripped.startswith("DJANGO_SECRET_KEY="):
+            continue
+        _, value = stripped.split("=", 1)
+        if value:
+            os.environ["DJANGO_SECRET_KEY"] = value
+        break
 
 
 def _state_dir():
