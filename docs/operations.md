@@ -42,6 +42,7 @@ it does **not** belong in this document.
 Those operations are covered by:
 
 - `docs/quickstart.md`
+- `docs/quickstart-docker.md`
 - `docs/maintenance.md`
 
 ---

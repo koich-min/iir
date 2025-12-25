@@ -37,6 +37,11 @@ Container / Shared Mode follows these principles:
 
 ## Deployment Overview
 
+> Note:
+> For local or private evaluation using Docker, see `docs/quickstart-docker.md`.
+> This document focuses on **shared / boundary deployments** and does not describe
+> evaluation-only setups.
+
 While Container / Shared Mode is typically deployed with an external database
 (PostgreSQL or MySQL), a SQLite-based setup may be used for evaluation,
 testing, or small-scale shared environments.

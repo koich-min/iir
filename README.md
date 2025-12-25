@@ -97,9 +97,12 @@ Docker usage differs from direct CLI usage in that:
 - State is stored in a volume-mounted directory
 - Django lifecycle operations are **explicit and manual**
 
-For the verified Docker evaluation flow, see:
+For a verified, step-by-step evaluation flow using Docker, see:
 
-- `docs/quickstart.md`
+- `docs/quickstart-docker.md`
+
+This Docker-based setup is **not a replacement** for
+Local / Personal Mode workflows and should not be exposed publicly.
 
 ---
 
