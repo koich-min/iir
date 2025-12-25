@@ -28,12 +28,13 @@ It does not claim to provide complete security guarantees.
 
 ---
 
-## About MCP integration
+## MCP (Model Context Protocol) Integration
 
-MCP support is planned as an **optional execution mode** for iir.
-It is primarily intended for **on-premise or self-hosted LLM setups**.
+iir supports an **optional MCP (Model Context Protocol) execution mode**
+that can be used as a **transform-only final output boundary** for LLM tool use.
 
-MCP integration does not change the core concept of iir.
+This mode is primarily intended for **on-premise or self-hosted LLM setups**
+and does not change the core concept of iir.
 Replacement logic and safety assumptions remain the same,
 and MCP is **not required** for using iir effectively.
 
