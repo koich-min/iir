@@ -135,7 +135,7 @@ echo "connect to my.domain" | iir replace
 
 > Note:
 > When running iir via Docker, the initialization and migration steps
-> are different. Refer to `docs/quickstart.md` for Docker-specific instructions.
+> are different. Refer to `docs/quickstart-docker.md` for Docker-specific instructions.
 
 ---
 

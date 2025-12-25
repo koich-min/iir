@@ -203,4 +203,5 @@ and the same dictionary.
 
 ## CLI and Django Relationship
 
-iir is implemented as a Django-based
+iir is implemented as a Django-based application, and all CLI commands are thin wrappers around Django execution.
+
