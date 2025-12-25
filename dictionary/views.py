@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
 from .models import Entry
-from .replacement import replace
+from .services.replacement_internal import replace_text_internal
 
 
 @require_http_methods(["GET", "POST"])
@@ -23,13 +23,7 @@ def replace_view(request):
 
     if request.method == "POST":
         try:
-            if selected:
-                entries = Entry.objects.filter(
-                    is_active=True, category__in=selected
-                ).iterator()
-                output = replace(text, entries=entries)
-            else:
-                output = text
+            output = replace_text_internal(text, include_categories=selected)
         except Exception:
             output = text
 

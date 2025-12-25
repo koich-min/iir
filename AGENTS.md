@@ -205,3 +205,15 @@ and the same dictionary.
 
 iir is implemented as a Django-based application, and all CLI commands are thin wrappers around Django execution.
 
+## MCP Scope and Constraints
+
+When used via MCP (Model Context Protocol), iir exposes **transform-only capabilities**.
+
+The MCP interface is strictly limited to text replacement execution.
+It must not provide read access to the dictionary, write operations,
+administrative functions, or any form of reverse mapping.
+
+MCP is treated as a final output boundary for LLM-generated text,
+not as a general-purpose API.
+
+MCP must call transform-only service without filters

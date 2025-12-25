@@ -34,15 +34,7 @@ def replace(text: str, entries: Iterable[Entry] | None = None) -> str:
     Entries are applied from longest value to shortest to avoid substring
     collisions. Only active entries are considered.
     """
-    active_entries = _load_entries(entries)
-    replacements: List[Tuple[str, str]] = []
-
-    for entry in active_entries:
-        if not entry.value:
-            raise ValueError("Entry value cannot be empty.")
-        replacements.append((entry.value, pseudonym_for(entry)))
-
-    replacements.sort(key=lambda item: (-len(item[0]), item[0], item[1]))
+    replacements = _sorted_replacements(_load_entries(entries))
 
     output = text
     for value, pseudonym in replacements:
@@ -55,3 +47,16 @@ def _load_entries(entries: Iterable[Entry] | None) -> Iterable[Entry]:
     if entries is None:
         return Entry.objects.filter(is_active=True).iterator()
     return (entry for entry in entries if entry.is_active)
+
+
+def _sorted_replacements(
+    entries: Iterable[Entry],
+) -> List[Tuple[str, str]]:
+    replacements: List[Tuple[str, str]] = []
+    for entry in entries:
+        if not entry.value:
+            raise ValueError("Entry value cannot be empty.")
+        replacements.append((entry.value, pseudonym_for(entry)))
+
+    replacements.sort(key=lambda item: (-len(item[0]), item[0], item[1]))
+    return replacements

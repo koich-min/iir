@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from dictionary.models import Entry
-from dictionary.replacement import replace
+from dictionary.services.replacement_internal import replace_text_internal
 
 
 class ReplaceAPIView(APIView):
@@ -18,28 +18,31 @@ class ReplaceAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        include_categories = request.data.get("include_categories") or []
-        exclude_categories = request.data.get("exclude_categories") or []
+        include_categories = request.data.get("include_categories", None)
+        exclude_categories = request.data.get("exclude_categories", None)
 
-        if include_categories and not isinstance(include_categories, list):
+        if include_categories is not None and not isinstance(include_categories, list):
             return Response(
                 {"detail": "include_categories must be a list"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        if exclude_categories and not isinstance(exclude_categories, list):
+        if exclude_categories is not None and not isinstance(exclude_categories, list):
             return Response(
                 {"detail": "exclude_categories must be a list"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        entries = Entry.objects.filter(is_active=True)
-        if include_categories:
-            entries = entries.filter(category__in=include_categories)
-        elif exclude_categories:
-            entries = entries.exclude(category__in=exclude_categories)
+        if include_categories == []:
+            include_categories = None
+        if exclude_categories == []:
+            exclude_categories = None
 
-        output = replace(text, entries=entries.iterator())
+        output = replace_text_internal(
+            text,
+            include_categories=include_categories,
+            exclude_categories=exclude_categories,
+        )
         return Response({"text": output})
 
 

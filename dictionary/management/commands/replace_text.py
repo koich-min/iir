@@ -1,10 +1,12 @@
 import sys
-from collections import defaultdict
 
 from django.core.management.base import BaseCommand
 
 from dictionary.models import Entry
-from dictionary.replacement import pseudonym_for, replace
+from dictionary.services.replacement_internal import (
+    replace_text_internal,
+    replace_text_internal_with_counts,
+)
 
 
 class Command(BaseCommand):
@@ -49,18 +51,17 @@ class Command(BaseCommand):
             use_all=options.get("use_all", False),
         )
 
-        entries_qs = Entry.objects.filter(is_active=True)
-        if categories:
-            entries_qs = entries_qs.filter(category__in=categories)
-        entries = list(entries_qs)
-
         if options.get("dry_run"):
-            _, counts = self._replace_with_counts(stdin_text, entries)
+            _, counts = replace_text_internal_with_counts(
+                stdin_text, include_categories=categories
+            )
             for category in sorted(counts.keys()):
                 self.stderr.write(f"{category}: {counts[category]}")
             return
 
-        output = replace(stdin_text, entries=entries) if entries else stdin_text
+        output = replace_text_internal(
+            stdin_text, include_categories=categories
+        )
         self.stdout.write(output, ending="")
 
     def _resolve_categories(self, categories, excludes, use_all=False):
@@ -77,25 +78,3 @@ class Command(BaseCommand):
             active_categories -= set(excludes)
 
         return active_categories
-
-    def _replace_with_counts(self, text, entries):
-        replacements = []
-        for entry in entries:
-            if not entry.value:
-                raise ValueError("Entry value cannot be empty.")
-            replacements.append(
-                (entry.value, pseudonym_for(entry), entry.category)
-            )
-
-        replacements.sort(key=lambda item: (-len(item[0]), item[0], item[1]))
-
-        counts = defaultdict(int)
-        output = text
-        for value, pseudonym, category in replacements:
-            occurrences = output.count(value)
-            if not occurrences:
-                continue
-            counts[category] += occurrences
-            output = output.replace(value, pseudonym)
-
-        return output, counts
