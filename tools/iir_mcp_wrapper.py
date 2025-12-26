@@ -65,6 +65,10 @@ def handle(req: dict):
             "serverInfo": {"name": "iir-mcp-wrapper", "version": "0.1.0"},
         }, None
 
+    if method == "initialized":
+        # notification, no response
+        return None, None, None
+
     if method == "tools/list":
         return _id, {
             "tools": [
@@ -113,6 +117,8 @@ def main():
         try:
             req = json.loads(line)
             _id, result, error = handle(req)
+            if _id is None:
+                continue
             reply(_id, result=result, error=error)
         except Exception as e:
             # If id is unknown, reply with null id per JSON-RPC convention
